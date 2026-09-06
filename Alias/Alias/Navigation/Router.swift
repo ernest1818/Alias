@@ -6,21 +6,25 @@
 //
 
 import Foundation
+import Combine
 
-enum Route: Hashable {  
-    case continueGame
+enum Route: Hashable {
+    case resumeGame(GameSessionSnapshot)
+    case showRules
     case showCommand
     case showSettings([Team])
     case showCategoryList(GameConfigModel)
     case showStartGame(GameConfigModel)
 }
 
+@MainActor
 protocol RouterProtocol {
     func add(route: Route)
     func back()
     func backToRoot()
 }
 
+@MainActor
 final class Router: ObservableObject {
     
     static let shared = Router()
@@ -36,6 +40,7 @@ extension Router: RouterProtocol {
     }
     
     func back() {
+        guard !path.isEmpty else { return }
         path.removeLast()
     }
     

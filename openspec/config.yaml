@@ -1,0 +1,43 @@
+schema: spec-driven
+
+context: |
+  Product: Alias, a local team-based word-explanation party game.
+  Platform: iOS 17.5, Swift 5, SwiftUI, Combine, XCTest and XCUITest.
+  Product UI is currently a mixture of Russian and English; preserve existing
+  copy unless a change explicitly includes localization or wording.
+
+  Architecture: lightweight feature-oriented MVVM. SwiftUI views render state
+  and forward intent. ObservableObject view models own validation, navigation
+  requests and state transitions. Navigation uses typed Route values and
+  RouterProtocol. New-game configuration flows forward through Team,
+  Configuration and GameConfigModel. GameState models mutually exclusive game
+  phases. Small preferences are encoded into UserDefaults.
+
+  Source of truth: openspec/specs contains accepted observable behavior. Code
+  and tests are evidence of actual behavior. Known disagreements are tracked in
+  docs/IMPLEMENTATION_GAPS.md and must not be silently normalized into specs.
+
+  Quality: preserve existing behavior outside the approved delta. Add
+  deterministic XCTest coverage for changed view-model transitions and
+  configuration propagation. Control timers, randomness and persisted defaults
+  in tests. Do not introduce a new architecture layer or third-party framework
+  without a concrete requirement and explicit design decision.
+
+rules:
+  proposal:
+    - State the user problem, affected capability specs, non-goals and known-gap impact.
+    - Separate user-visible behavior changes from refactoring and implementation cleanup.
+    - Keep one change focused on one coherent outcome.
+  specs:
+    - Describe observable product behavior in Russian using SHALL or MUST for normative statements.
+    - Give every requirement at least one concrete four-heading Scenario with GIVEN, WHEN and THEN bullets.
+    - Include material edge cases and invariants without naming Swift types or source files.
+    - For MODIFIED requirements, copy the complete current requirement and all surviving scenarios.
+  design:
+    - Explain how the change preserves the architecture baseline or explicitly improves a documented limitation.
+    - Document test seams for time, randomness, persistence and navigation when they are affected.
+    - Include alternatives and trade-offs for any new dependency or architectural boundary.
+  tasks:
+    - Keep tasks dependency-ordered, session-sized and formatted as numbered checkboxes.
+    - Pair implementation tasks with explicit automated or manual verification.
+    - Include spec validation, Xcode build and relevant test execution before archive.

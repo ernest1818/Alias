@@ -9,17 +9,35 @@ import SwiftUI
 
 struct GameView: View {
     @ObservedObject var viewModel: GameViewModel
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var countdownScale = 0.55
+    @State private var countdownOpacity = 0.25
     
     var body: some View {
         content
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: viewModel.returnToMenu) {
+                        HStack {
+                            Image(systemName: "chevron.left")
+                            Text("Меню")
+                                .font(.title3)
+                                .padding(.leading, 5)
+                        }
+                    }
+                }
                 ToolbarItem(placement: .principal) {
                     Text(viewModel.currentTeam.name)
                         .font(.headline)
                 }
             }
             .gradientBackground()
+            .onChange(of: scenePhase) { phase in
+                if phase != .active {
+                    viewModel.applicationDidBecomeInactive()
+                }
+            }
     }
     
     @ViewBuilder
@@ -35,6 +53,8 @@ struct GameView: View {
                 }
             case .paused:
                 pausedView
+            case .resumeCountdown:
+                resumeCountdownView
             case .roundEnd:
                 roundEndView
             case .gameEnd:
@@ -104,6 +124,27 @@ struct GameView: View {
             }
             .buttonStyle(.borderedProminent)
             .padding()
+        }
+    }
+
+    @ViewBuilder
+    private var resumeCountdownView: some View {
+        if let step = viewModel.resumeCountdownStep {
+            Text(step.title)
+                .font(.system(size: step == .started ? 64 : 112, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+                .scaleEffect(countdownScale)
+                .opacity(countdownOpacity)
+                .id(step)
+                .onAppear {
+                    countdownScale = 0.55
+                    countdownOpacity = 0.25
+                    withAnimation(.spring(response: 0.45, dampingFraction: 0.58)) {
+                        countdownScale = 1
+                        countdownOpacity = 1
+                    }
+                }
+                .accessibilityIdentifier("game.resumeCountdown")
         }
     }
     

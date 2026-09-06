@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 
+@MainActor
 final class WordsListViewModel: ObservableObject {
     @Published var wordsList: [WordsCategory] = WordsCategory.allCases
     
@@ -24,8 +25,8 @@ final class WordsListViewModel: ObservableObject {
     }
 }
 
-public enum WordsCategory: CaseIterable, Identifiable {
-    public var id: UUID { UUID() }
+public enum WordsCategory: String, CaseIterable, Codable, Identifiable, Hashable {
+    public var id: String { rawValue }
     case light
     case optimise
     case forFamily
