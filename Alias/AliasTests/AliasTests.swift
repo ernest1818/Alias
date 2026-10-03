@@ -1,6 +1,79 @@
 import SwiftData
+import SwiftUI
+import UIKit
 import XCTest
 @testable import Alias
+
+final class CardImpactFoundationsTests: XCTestCase {
+    func testSemanticColorTokensMatchApprovedPalette() {
+        XCTAssertEqual(
+            Dictionary(uniqueKeysWithValues: CardImpactPaletteToken.allCases.map { ($0, $0.hex) }),
+            [
+                .ink900: "121319",
+                .ink800: "20222B",
+                .bone50: "F4EFE6",
+                .bone100: "E7E0D6",
+                .cobalt500: "3157FF",
+                .chartreuse500: "C7F000",
+                .vermilion500: "FF4D2E",
+                .amber500: "FFB11B"
+            ]
+        )
+    }
+
+    func testMetricTokensMatchApprovedNumericContract() {
+        XCTAssertEqual(CardImpactSpacing.all, [4, 8, 12, 16, 24, 32, 48, 64])
+        XCTAssertEqual(CardImpactRadius.all, [8, 14, 18, 24])
+        XCTAssertEqual(CardImpactLayout.minimumTouchTarget, 44)
+        XCTAssertEqual(CardImpactLayout.setupTouchTarget, 48)
+        XCTAssertEqual(CardImpactLayout.maximumContentWidth, 600)
+        XCTAssertEqual(CardImpactLayout.screenInset(for: 375), 20)
+        XCTAssertEqual(CardImpactLayout.screenInset(for: 393), 24)
+        XCTAssertEqual(CardImpactLayout.screenInset(for: 430), 32)
+    }
+
+    func testMotionDurationsMatchApprovedContract() {
+        XCTAssertEqual(CardImpactMotion.Duration.instant, 0.08)
+        XCTAssertEqual(CardImpactMotion.Duration.press, 0.12)
+        XCTAssertEqual(CardImpactMotion.Duration.micro, 0.16)
+        XCTAssertEqual(CardImpactMotion.Duration.feedback, 0.20)
+        XCTAssertEqual(CardImpactMotion.Duration.transition, 0.28)
+        XCTAssertEqual(CardImpactMotion.Duration.cardExit, 0.22)
+        XCTAssertEqual(CardImpactMotion.Duration.cardEnter, 0.16)
+        XCTAssertEqual(CardImpactMotion.Duration.cardResolution, 0.38)
+        XCTAssertEqual(CardImpactMotion.Duration.result, 0.52)
+        XCTAssertEqual(CardImpactMotion.Duration.victory, 0.72)
+    }
+
+    func testSofiaSansDisplayFontIsRegistered() {
+        XCTAssertTrue(CardImpactTypography.isDisplayFontAvailable)
+    }
+
+    @MainActor
+    func testFoundationGalleryRendersReferenceSizes() throws {
+        let referenceSizes: [(name: String, size: CGSize)] = [
+            ("compact-375x667", CGSize(width: 375, height: 667)),
+            ("standard-393x852", CGSize(width: 393, height: 852)),
+            ("large-430x932", CGSize(width: 430, height: 932))
+        ]
+
+        for reference in referenceSizes {
+            let renderer = ImageRenderer(
+                content: CardImpactFoundationGallery()
+                    .frame(width: reference.size.width, height: reference.size.height)
+            )
+            renderer.scale = 1
+
+            let image = try XCTUnwrap(renderer.uiImage)
+            XCTAssertEqual(image.size, reference.size)
+
+            let attachment = XCTAttachment(image: image)
+            attachment.name = "card-impact-foundations-\(reference.name)"
+            attachment.lifetime = .keepAlways
+            add(attachment)
+        }
+    }
+}
 
 final class PartyPopDesignSystemTests: XCTestCase {
     func testSemanticColorTokensMatchApprovedPalette() {

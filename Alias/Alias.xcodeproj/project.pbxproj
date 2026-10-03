@@ -93,6 +93,7 @@
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		889D2CA32E06D003001C81DF /* Resourses */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Resourses; sourceTree = "<group>"; };
+		88C1A0002F00000100000001 /* CardImpact */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = CardImpact; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -142,6 +143,7 @@
 		88729DDC2D5D2491007B62CB /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				88C1A0002F00000100000001 /* CardImpact */,
 				88A1C0112F00000100000011 /* PartyPopDesignSystem.swift */,
 				88729DDD2D5D24B7007B62CB /* AliasButton.swift */,
 				88E6F9A12DA1A9FD00735310 /* GameSkipButton.swift */,
@@ -297,6 +299,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				889D2CA32E06D003001C81DF /* Resourses */,
+				88C1A0002F00000100000001 /* CardImpact */,
 			);
 			name = Alias;
 			productName = Alias;
