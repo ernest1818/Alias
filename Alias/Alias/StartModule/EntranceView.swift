@@ -4,48 +4,39 @@ struct EntranceView: View {
     @ObservedObject var viewModel: EntranceViewModel
 
     var body: some View {
-        VStack {
-            Text("Alias")
-                .foregroundStyle(.white)
-                .font(.superCrownXXL)
-                .padding(40)
-                .shadow(color: .black.opacity(0.3), radius: 1, x: 0, y: 6)
-                .background {
-                    Circle().stroke(Color.white, lineWidth: 4)
-                }
-                .background {
-                    ZStack {
-                        Color.greenButtonBackground
-                        Circle()
-                            .fill(.greenRight)
-                            .overlay {
-                                Rectangle()
-                                    .fill(Color(.greenLeft))
-                                    .rotationEffect(.degrees(55))
-                                    .frame(width: 200, height: 200)
-                                    .offset(x: -90, y: 40)
-                            }
-                            .clipShape(Circle())
-                            .offset(y: -10)
-                    }
-                    .clipShape(Circle())
-                    .shadow(color: .black.opacity(0.3), radius: 1, x: 0, y: 8)
-                }
+        VStack(spacing: PartySpacing.standard) {
+            ZStack {
+                Circle().fill(Color.partyPrimaryAction)
+                Circle()
+                    .stroke(Color.partyLime, lineWidth: 4)
+                    .padding(6)
+                Text("Alias")
+                    .foregroundStyle(Color.partyPrimaryText)
+                    .font(PartyTypography.display)
+                    .minimumScaleFactor(0.7)
+            }
+            .frame(width: 176, height: 176)
+            .shadow(color: Color.partyPrimaryAction.opacity(0.5), radius: 24, y: 12)
+            .padding(.top, PartySpacing.xxLarge)
 
             Spacer()
 
             ForEach(viewModel.menus) { item in
-                AliasButton(
-                    action: { viewModel.select(item.action) },
-                    title: item.name
-                )
+                Group {
+                    if item.action == .rules {
+                        menuButton(for: item)
+                            .buttonStyle(PartySecondaryButtonStyle())
+                    } else {
+                        menuButton(for: item)
+                            .buttonStyle(PartyPrimaryButtonStyle())
+                    }
+                }
                 .disabled(item.action == .continueGame && !viewModel.hasSavedGame)
-                .opacity(item.action == .continueGame && !viewModel.hasSavedGame ? 0.45 : 1)
                 .accessibilityIdentifier("entrance.\(item.id)")
-                .padding(.top, 10)
             }
+            .frame(maxWidth: PartyLayout.maximumContentWidth)
         }
-        .padding()
+        .padding(PartySpacing.large)
         .gradientBackground()
         .onAppear(perform: viewModel.refreshSaveAvailability)
         .alert(
@@ -61,8 +52,24 @@ struct EntranceView: View {
             Text("Текущая незавершённая игра будет удалена.")
         }
     }
+
+    private func icon(for action: EntranceMenuAction) -> PartyIcon {
+        switch action {
+        case .continueGame: return .play
+        case .newGame: return .add
+        case .rules: return .rules
+        }
+    }
+
+    private func menuButton(for item: EntranceGroup) -> some View {
+        Button(action: { viewModel.select(item.action) }) {
+            Label(item.name, systemImage: icon(for: item.action).systemName)
+        }
+    }
 }
 
-#Preview {
-    EntranceView(viewModel: EntranceViewModel())
-}
+#if DEBUG
+    #Preview {
+        EntranceView(viewModel: EntranceViewModel())
+    }
+#endif

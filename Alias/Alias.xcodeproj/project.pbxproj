@@ -35,6 +35,7 @@
 		88E6F9AD2DAC545300735310 /* StartGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88E6F9AC2DAC545300735310 /* StartGameView.swift */; };
 		88E6F9AF2DAC585700735310 /* GradientBackgraund+Modifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88E6F9AE2DAC585700735310 /* GradientBackgraund+Modifier.swift */; };
 		88A1C0012F00000100000001 /* GameChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88A1C0022F00000100000001 /* GameChallenge.swift */; };
+		88A1C0102F00000100000010 /* PartyPopDesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88A1C0112F00000100000011 /* PartyPopDesignSystem.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -87,6 +88,7 @@
 		88E6F9AC2DAC545300735310 /* StartGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartGameView.swift; sourceTree = "<group>"; };
 		88E6F9AE2DAC585700735310 /* GradientBackgraund+Modifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GradientBackgraund+Modifier.swift"; sourceTree = "<group>"; };
 		88A1C0022F00000100000001 /* GameChallenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameChallenge.swift; sourceTree = "<group>"; };
+		88A1C0112F00000100000011 /* PartyPopDesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartyPopDesignSystem.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -140,6 +142,7 @@
 		88729DDC2D5D2491007B62CB /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				88A1C0112F00000100000011 /* PartyPopDesignSystem.swift */,
 				88729DDD2D5D24B7007B62CB /* AliasButton.swift */,
 				88E6F9A12DA1A9FD00735310 /* GameSkipButton.swift */,
 				88E6F9AE2DAC585700735310 /* GradientBackgraund+Modifier.swift */,
@@ -409,6 +412,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				88A1C0102F00000100000010 /* PartyPopDesignSystem.swift in Sources */,
 				88729DD92D5D1A79007B62CB /* MakeCommandViewModel.swift in Sources */,
 				88729DD52D5942D3007B62CB /* Router.swift in Sources */,
 				88729DEF2D624E7C007B62CB /* WordsListViewModel.swift in Sources */,

@@ -58,7 +58,15 @@ struct AliasApp: App {
             )
             .navigationBarBackButtonHidden(true)
         case .showRules:
-            Text("Rules")
+            VStack(spacing: PartySpacing.large) {
+                Image(systemName: PartyIcon.rules.systemName)
+                    .font(.system(size: 48, weight: .bold))
+                    .foregroundStyle(Color.partyYellow)
+                Text("Rules")
+                    .font(PartyTypography.screenTitle)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .gradientBackground()
         case .showCommand:
             MakeCommandView(viewModel: .init())
         case .showCategoryList(let configuration):

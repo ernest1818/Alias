@@ -1,69 +1,62 @@
-//
-//  WordsListView.swift
-//  Alias
-//
-//  Created by Ernest Avagovich on 16.02.2025.
-//
-
 import SwiftUI
 
 struct WordsListView: View {
-    
     @ObservedObject var viewModel: WordsListViewModel
-    
+
     var body: some View {
-            VStack {
-                ScrollView {
-                    ForEach(viewModel.wordsList) { item in
-                        Button(action: {
-                            viewModel.showStartGame(item)
-                        }, label: {
-                            HStack {
-                                Text(item.title)
-                                    .font(.title)
-                                    .bold()
-                                    .foregroundColor(.darkSlate)
-                                
-                                Spacer(minLength: 1)
-                                
-                                Image(systemName: "chevron.right")
-                                    .renderingMode(.template)
-                                    .resizable()
-                                    .fontWeight(.bold)
-                                    .frame(width: 12, height: 18, alignment: .trailing)
-                                    .foregroundColor(.lightBlack)
-                                
-                            }
-                            .padding(.horizontal, 20)
-                            .padding(.vertical, 40)
-                            .background {
-                                RoundedRectangle(cornerRadius: 20)
-                                    .fill(item.backGroundColor.opacity(0.3))
-                            }
-                            .padding(.horizontal, 20)
-                        })
+        ScrollView {
+            LazyVStack(spacing: PartySpacing.medium) {
+                ForEach(viewModel.wordsList) { item in
+                    Button(action: { viewModel.showStartGame(item) }) {
+                        HStack(spacing: PartySpacing.standard) {
+                            Circle()
+                                .fill(item.partyAccent)
+                                .frame(width: 12, height: 12)
+
+                            Text(item.title)
+                                .font(PartyTypography.section)
+                                .foregroundStyle(Color.partyPrimaryText)
+                                .multilineTextAlignment(.leading)
+                                .lineLimit(2)
+                                .minimumScaleFactor(0.8)
+
+                            Spacer(minLength: PartySpacing.small)
+
+                            Image(systemName: PartyIcon.forward.systemName)
+                                .font(.system(size: 18, weight: .bold))
+                                .foregroundStyle(item.partyAccent)
+                        }
+                        .contentShape(Rectangle())
+                        .partyCard(accent: item.partyAccent)
                     }
+                    .buttonStyle(.plain)
+                    .accessibilityHint("Выбрать категорию")
                 }
+                .padding(.horizontal, PartySpacing.large)
             }
-            .gradientBackground()
+            .padding(.vertical, PartySpacing.large)
+        }
+        .gradientBackground()
     }
 }
 
-#Preview {
-    WordsListView(
-        viewModel: .init(
-            gameConfig: GameConfigModel(
-                teams: [],
-                configuration: Configuration(
-                    wordsCount: 1,
-                    roundTimer: 1,
-                    isSkipPenalty: false,
-                    islastWordForAllTeam: false,
-                    challenges: .off,
-                    selectedChallenges: [],
-                    isSoundOn: false
+#if DEBUG
+    #Preview {
+        WordsListView(
+            viewModel: .init(
+                gameConfig: GameConfigModel(
+                    teams: [],
+                    configuration: Configuration(
+                        wordsCount: 1,
+                        roundTimer: 1,
+                        isSkipPenalty: false,
+                        islastWordForAllTeam: false,
+                        challenges: .off,
+                        selectedChallenges: [],
+                        isSoundOn: false
+                    )
                 )
             )
         )
-    )
-}
+    }
+#endif

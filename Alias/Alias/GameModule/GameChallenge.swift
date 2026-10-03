@@ -56,16 +56,16 @@ public enum GameChallenge: String, CaseIterable, Codable, Identifiable, Hashable
 
     public var symbolName: String {
         switch self {
-        case .whisper: return "speaker.wave.1"
-        case .robotVoice: return "cpu"
-        case .commentator: return "mic"
-        case .scaryStory: return "moon.stars"
-        case .slowly: return "tortoise"
-        case .noGestures: return "hand.raised.slash"
-        case .noFillerWords: return "text.bubble"
-        case .shortSentences: return "text.line.first.and.arrowtriangle.forward"
-        case .firstPerson: return "person.fill"
-        case .imagineOpening: return "sparkles"
+        case .whisper: return PartyIcon.whisper.systemName
+        case .robotVoice: return PartyIcon.robotVoice.systemName
+        case .commentator: return PartyIcon.commentator.systemName
+        case .scaryStory: return PartyIcon.scaryStory.systemName
+        case .slowly: return PartyIcon.slowly.systemName
+        case .noGestures: return PartyIcon.noGestures.systemName
+        case .noFillerWords: return PartyIcon.noFillerWords.systemName
+        case .shortSentences: return PartyIcon.shortSentences.systemName
+        case .firstPerson: return PartyIcon.firstPerson.systemName
+        case .imagineOpening: return PartyIcon.imagineOpening.systemName
         }
     }
 

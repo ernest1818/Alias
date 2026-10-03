@@ -2,6 +2,49 @@ import SwiftData
 import XCTest
 @testable import Alias
 
+final class PartyPopDesignSystemTests: XCTestCase {
+    func testSemanticColorTokensMatchApprovedPalette() {
+        XCTAssertEqual(
+            Dictionary(uniqueKeysWithValues: PartyColorToken.allCases.map { ($0, $0.hex) }),
+            [
+                .background: "193564",
+                .elevated: "244777",
+                .spotlight: "5182BC",
+                .primaryAction: "DC3C24",
+                .coral: "DC3C24",
+                .lime: "E6BF98",
+                .yellow: "E6BF98",
+                .success: "E6BF98",
+                .danger: "DC3C24",
+                .info: "5182BC",
+                .primaryText: "F6E8DD",
+                .secondaryText: "E6BF98"
+            ]
+        )
+    }
+
+    func testLayoutTokensMatchApprovedScaleAndTouchTarget() {
+        XCTAssertEqual(PartySpacing.all, [4, 8, 12, 16, 24, 32, 40])
+        XCTAssertEqual(PartyRadius.all, [12, 20, 28, 1_000])
+        XCTAssertEqual(PartyLayout.minimumTouchTarget, 44)
+    }
+
+    func testSemanticIconsAndChallengeMappingsUseExpectedSFSymbols() {
+        XCTAssertEqual(PartyIcon.play.systemName, "play.fill")
+        XCTAssertEqual(PartyIcon.pause.systemName, "pause.fill")
+        XCTAssertEqual(PartyIcon.add.systemName, "plus")
+        XCTAssertEqual(PartyIcon.delete.systemName, "trash.fill")
+        XCTAssertEqual(PartyIcon.back.systemName, "chevron.left")
+        XCTAssertEqual(PartyIcon.forward.systemName, "chevron.right")
+        XCTAssertEqual(PartyIcon.correct.systemName, "checkmark")
+        XCTAssertEqual(PartyIcon.skip.systemName, "xmark")
+
+        XCTAssertEqual(GameChallenge.whisper.symbolName, PartyIcon.whisper.systemName)
+        XCTAssertEqual(GameChallenge.robotVoice.symbolName, PartyIcon.robotVoice.systemName)
+        XCTAssertEqual(GameChallenge.imagineOpening.symbolName, PartyIcon.imagineOpening.systemName)
+    }
+}
+
 @MainActor
 final class SnapshotAndTimerTests: XCTestCase {
     func testSnapshotJSONRoundTripPreservesStableIdentityAndState() throws {

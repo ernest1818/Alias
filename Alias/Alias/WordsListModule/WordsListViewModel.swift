@@ -48,18 +48,18 @@ public enum WordsCategory: String, CaseIterable, Codable, Identifiable, Hashable
         }
     }
     
-    public var backGroundColor: Color {
+    public var partyAccent: Color {
         switch self {
         case .light:
-            return .beanRed
+            return .partyCoral
         case .optimise:
-            return .yellowOrange
+            return .partyYellow
         case .forFamily:
-            return .pinkPink
+            return .partyLime
         case .random:
-            return .yellowGreen
+            return .partyInfo
         case .heavy:
-            return .loveRed
+            return .partyDanger
         }
     }
 }

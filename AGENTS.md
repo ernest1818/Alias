@@ -4,43 +4,35 @@ These instructions apply to the entire repository.
 
 ## Product and source of truth
 
-Alias is a local iOS party game built with SwiftUI. The active behavioral
-contract lives in `openspec/specs/`; `openspec/config.yaml` contains shared
-project context and artifact rules.
+Alias is a local iOS party game built with SwiftUI. Product, UX and visual
+decisions are documented in `DesignDocs/`. OpenSpec is not used in this
+repository workflow and must not be treated as a source of truth.
 
 Use this precedence when sources disagree:
 
 1. The user's current, explicit request.
-2. An approved active delta in `openspec/changes/<change-name>/specs/`.
-3. The current capability specs in `openspec/specs/`.
-4. Observable behavior in code and tests.
-5. Historical notes and archived changes.
+2. Accepted decisions in `DesignDocs/`.
+3. Observable behavior in code and tests.
+4. `docs/ARCHITECTURE.md` and other current project documentation.
+5. Historical notes.
 
-Do not silently choose between a spec and code mismatch. Record or update the
-entry in `docs/IMPLEMENTATION_GAPS.md`, explain the mismatch, and confirm whether
-the code or the spec should change when intent is not already explicit.
+Do not silently choose between an accepted design decision and current code.
+Record or update the entry in `docs/IMPLEMENTATION_GAPS.md`, explain the
+mismatch, and ask only when the intended behavior is not already explicit.
 
-## SDD workflow
+## Product change workflow
 
 Before changing user-visible behavior:
 
-1. Read `openspec/config.yaml`, the affected current specs, and
-   `docs/IMPLEMENTATION_GAPS.md`.
+1. Read the affected files in `DesignDocs/` and `docs/IMPLEMENTATION_GAPS.md`.
 2. Inspect the live implementation and tests for the affected capability.
-3. Create a focused OpenSpec change with `proposal.md`, delta specs, optional
-   `design.md`, and `tasks.md` before implementation.
-4. Use `ADDED`, `MODIFIED`, `REMOVED`, or `RENAMED` requirements in deltas.
-5. Obtain agreement on the behavior before implementing it.
-6. Implement tasks, add tests for each material scenario, then validate code
-   against both the delta and unaffected current specs.
-7. Archive the change only after implementation and verification are complete.
-
-Keep current specs under one `## Requirements` section. Every requirement must
-contain at least one `#### Scenario:`. Specs describe observable behavior;
-implementation choices belong in `design.md` or architecture documentation.
-
-Small internal refactors that cannot alter observable behavior may omit delta
-specs, but their proposal must explicitly set or document `skip_specs: true`.
+3. Use accepted DesignDocs decisions directly. If behavior is still unresolved,
+   document the decision and obtain agreement before implementation.
+4. Implement in focused vertical slices and add tests for each material state
+   transition, validation rule and persistence path.
+5. Validate implementation against the affected DesignDocs and unaffected
+   product invariants.
+6. Update `docs/IMPLEMENTATION_GAPS.md` when a mismatch is resolved or found.
 
 ## Architecture baseline
 
@@ -73,12 +65,6 @@ limitations.
 
 ## Verification
 
-Run specification validation after changing specs or deltas:
-
-```bash
-openspec validate --all --strict --no-interactive
-```
-
 Run the shared Xcode scheme after source changes:
 
 ```bash
@@ -89,15 +75,20 @@ xcodebuild \
   build
 ```
 
-Run tests using an installed simulator, replacing the device name when needed:
+Run unit tests using an installed simulator, replacing the device name when
+needed:
 
 ```bash
 xcodebuild \
   -project Alias/Alias.xcodeproj \
   -scheme Alias \
   -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+  -only-testing:AliasTests \
   test
 ```
+
+Do not run `AliasUITests`, UI tests, or UI performance tests. Only run them when
+the user explicitly requests a UI-test run in the current conversation.
 
 If full Xcode is unavailable, report that constraint rather than claiming the
 build or tests passed. Do not rely on the existing template tests as meaningful
@@ -112,8 +103,7 @@ A behavior change is complete only when:
 - deterministic XCTest coverage exists for state transitions and configuration
   propagation affected by the change;
 - timers, randomness, and persistence are controlled in tests;
-- OpenSpec strict validation passes;
 - the Xcode build and relevant tests pass, or the exact environment blocker is
   reported;
 - resolved entries are updated in `docs/IMPLEMENTATION_GAPS.md`;
-- the accepted delta is merged into current specs and archived.
+- affected DesignDocs remain aligned with the delivered behavior.

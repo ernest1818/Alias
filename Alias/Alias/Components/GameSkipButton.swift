@@ -24,22 +24,11 @@ public struct GameSkipButton: View {
     }
     
     public var body: some View {
-        Button {
-            action()
-        } label: {
-            VStack {
-                Image(systemName: title)
-                    .font(.largeTitle)
-                    .foregroundColor(color)
-            }
-            .padding(.horizontal, 60)
-            .padding(.vertical, 30)
-            .background {
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(Color.indigo.opacity(0.3))
-            }
-            
+        Button(action: action) {
+            Image(systemName: title)
+                .font(.system(size: 28, weight: .bold, design: .rounded))
+                .frame(maxWidth: .infinity, minHeight: 72)
         }
-        
+        .buttonStyle(PartySecondaryButtonStyle(tint: color))
     }
 }
