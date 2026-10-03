@@ -17,22 +17,79 @@ public struct GradientBackground: ViewModifier {
     
     public func body(content: Content) -> some View {
         ZStack {
-            switch gradient {
-            case .linear:
-                LinearGradient(gradient: Gradient(colors: [.backGroundColor2, .backGroundColor1]),
-                               startPoint: .top,
-                               endPoint: .bottom)
+            background
                 .ignoresSafeArea()
-            case .radial:
-                RadialGradient(
-                    gradient: Gradient(colors: [.backGroundColor2, .backGroundColor1]),
-                    center: .center,
-                    startRadius: 40,
-                    endRadius: 100
-                )
-                .ignoresSafeArea()
-            }
+
             content
+        }
+        .foregroundStyle(Color.partyPrimaryText)
+        .tint(Color.partyPrimaryAction)
+        .preferredColorScheme(.dark)
+    }
+
+    @ViewBuilder
+    private var background: some View {
+        ZStack {
+            Color.partyBackground
+
+            if #available(iOS 18.0, *) {
+                MeshGradient(
+                    width: 3,
+                    height: 3,
+                    points: meshPoints,
+                    colors: meshColors,
+                    background: Color.partyBackground,
+                    smoothsColors: true
+                )
+            } else {
+                legacyGradient
+            }
+        }
+    }
+
+    private var meshPoints: [SIMD2<Float>] {
+        let center: SIMD2<Float> = gradient == .radial
+            ? .init(0.5, 0.42)
+            : .init(0.62, 0.46)
+
+        return [
+            .init(0, 0), .init(0.46, 0), .init(1, 0),
+            .init(0, 0.48), center, .init(1, 0.56),
+            .init(0, 1), .init(0.42, 1), .init(1, 1)
+        ]
+    }
+
+    private var meshColors: [Color] {
+        [
+            .partyBackground, .partyInfo.opacity(0.82), .partyElevated,
+            .partyInfo.opacity(0.5), .partyBackground, .partyElevated,
+            .partyBackground, .partyPrimaryAction.opacity(0.62), .partyBackground
+        ]
+    }
+
+    @ViewBuilder
+    private var legacyGradient: some View {
+        if gradient == .radial {
+            RadialGradient(
+                colors: [
+                    .partyInfo.opacity(0.66),
+                    .partyBackground,
+                    .partyPrimaryAction.opacity(0.28)
+                ],
+                center: .top,
+                startRadius: 20,
+                endRadius: 700
+            )
+        } else {
+            LinearGradient(
+                colors: [
+                    .partyInfo.opacity(0.58),
+                    .partyBackground,
+                    .partyPrimaryAction.opacity(0.3)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
         }
     }
 }
@@ -43,7 +100,7 @@ public extension View {
     }
 }
 
-public enum GradientState {
+public enum GradientState: Equatable {
     case linear
     case radial
 }

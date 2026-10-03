@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 
+@MainActor
 final class WordsListViewModel: ObservableObject {
     @Published var wordsList: [WordsCategory] = WordsCategory.allCases
     
@@ -24,8 +25,8 @@ final class WordsListViewModel: ObservableObject {
     }
 }
 
-public enum WordsCategory: CaseIterable, Identifiable {
-    public var id: UUID { UUID() }
+public enum WordsCategory: String, CaseIterable, Codable, Identifiable, Hashable {
+    public var id: String { rawValue }
     case light
     case optimise
     case forFamily
@@ -47,18 +48,18 @@ public enum WordsCategory: CaseIterable, Identifiable {
         }
     }
     
-    public var backGroundColor: Color {
+    public var partyAccent: Color {
         switch self {
         case .light:
-            return .beanRed
+            return .partyCoral
         case .optimise:
-            return .yellowOrange
+            return .partyYellow
         case .forFamily:
-            return .pinkPink
+            return .partyLime
         case .random:
-            return .yellowGreen
+            return .partyInfo
         case .heavy:
-            return .loveRed
+            return .partyDanger
         }
     }
 }

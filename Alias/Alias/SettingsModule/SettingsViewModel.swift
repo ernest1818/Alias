@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 final class SettingsViewModel: ObservableObject {
     private let router = Router.shared
     private let teams: [Team]
@@ -220,7 +221,7 @@ public enum Challenge: Double, CaseIterable, Codable {
 }
 
 public struct Configuration: Identifiable {
-    public let id = UUID()
+    public let id: UUID
     public let wordsCount: Int
     public let roundTimer: Int
     public let isSkipPenalty: Bool
@@ -230,6 +231,7 @@ public struct Configuration: Identifiable {
     public let isSoundOn: Bool
     
     public init(
+        id: UUID = UUID(),
         wordsCount: Int,
         roundTimer: Int,
         isSkipPenalty: Bool,
@@ -238,6 +240,7 @@ public struct Configuration: Identifiable {
         selectedChallenges: [GameChallenge],
         isSoundOn: Bool
     ) {
+        self.id = id
         self.wordsCount = wordsCount
         self.roundTimer = roundTimer
         self.isSkipPenalty = isSkipPenalty

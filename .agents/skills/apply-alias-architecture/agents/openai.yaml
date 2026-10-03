@@ -1,0 +1,4 @@
+interface:
+  display_name: "Alias Architecture"
+  short_description: "Apply the project SwiftUI architecture"
+  default_prompt: "Use $apply-alias-architecture to implement this change consistently with the Alias app architecture."

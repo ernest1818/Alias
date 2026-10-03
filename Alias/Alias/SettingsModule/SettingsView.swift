@@ -1,223 +1,230 @@
-//
-//  SettingsView.swift
-//  Alias
-//
-//  Created by Ernest Avagovich on 16.02.2025.
-//
-
 import SwiftUI
 
 struct SettingsView: View {
-    
     @ObservedObject var viewModel: SettingsViewModel
     @State private var isChallengePickerExpanded = false
 
     var body: some View {
         VStack(spacing: 0) {
             ScrollView {
-                VStack(spacing: 40) {
+                VStack(spacing: PartySpacing.standard) {
                     sliderView(
                         title: "Количество слов",
                         subtitle: "необходимое для достижения победы",
+                        icon: .trophy,
                         slideRange: 20...200,
                         slideValue: $viewModel.wordsCount,
-                        step: 5.0
+                        step: 5
                     )
-                    
+
                     sliderView(
                         title: "Время раунда",
                         subtitle: "в секундах",
+                        icon: .timer,
                         slideRange: 10...120,
                         slideValue: $viewModel.roundTimer,
                         step: 5
                     )
-                    
-                    someSwitchView(
+
+                    switchView(
                         title: "Штраф за пропуск",
                         subtitle: "минус 1 очко",
                         switchValue: $viewModel.isSkipPenalty
                     )
-                    
-                    someSwitchView(
+
+                    switchView(
                         title: "Общее последнее слово",
                         subtitle: "последнее слово могут отгадывать все команды",
                         switchValue: $viewModel.islastWordForAllTeam
                     )
-                    
-                    challengeFrequencyView
 
+                    challengeFrequencyView
                     challengeSelectionView
-                    
-                    someSwitchView(
+
+                    switchView(
                         title: "Звук в игре",
                         subtitle: "включить эффекты",
                         switchValue: $viewModel.isSoundOn
                     )
                 }
-                .padding(.horizontal)
-                .padding(.vertical)
+                .padding(.horizontal, PartySpacing.large)
+                .padding(.vertical, PartySpacing.standard)
             }
 
-            AliasButton(action: {
-                viewModel.showNext()
-            }, title: "Next")
+            AliasButton(action: viewModel.showNext, title: "Next")
                 .disabled(!viewModel.canContinue)
-                .opacity(viewModel.canContinue ? 1 : 0.5)
-                .padding(.top, 12)
-                .padding(.bottom, 20)
+                .padding(.horizontal, PartySpacing.large)
+                .padding(.top, PartySpacing.medium)
+                .padding(.bottom, PartySpacing.large)
         }
         .gradientBackground()
     }
-    
+
     private func sliderView(
         title: String,
         subtitle: String,
+        icon: PartyIcon,
         slideRange: ClosedRange<Double>,
         slideValue: Binding<Double>,
-        step: Double = 1
+        step: Double
     ) -> some View {
-        VStack {
-            HStack {
-                VStack(alignment: .leading) {
-                    Text(title)
-                        .font(.title3)
-                    Text(subtitle)
-                        .font(.footnote)
-                }
-                Spacer(minLength: 0)
-                
-                Text("\(Int(slideValue.wrappedValue))")
-                    .font(.largeTitle)
-            }
-            Slider(value: slideValue, in: slideRange, step: step)
-                .padding(.horizontal, 30)
+        VStack(spacing: PartySpacing.standard) {
+            HStack(spacing: PartySpacing.medium) {
+                Image(systemName: icon.systemName)
+                    .font(.system(size: 22, weight: .bold))
+                    .foregroundStyle(Color.partyYellow)
+                    .frame(width: 32)
 
+                VStack(alignment: .leading, spacing: PartySpacing.xSmall) {
+                    Text(title)
+                        .font(PartyTypography.body.weight(.semibold))
+                    Text(subtitle)
+                        .font(PartyTypography.caption)
+                        .foregroundStyle(Color.partySecondaryText)
+                }
+
+                Spacer(minLength: PartySpacing.small)
+
+                Text("\(Int(slideValue.wrappedValue))")
+                    .font(PartyTypography.section)
+                    .foregroundStyle(Color.partyLime)
+            }
+
+            Slider(value: slideValue, in: slideRange, step: step)
+                .tint(.partyPrimaryAction)
         }
+        .partyCard()
     }
 
     private var challengeFrequencyView: some View {
-        VStack {
-            HStack {
-                VStack(alignment: .leading) {
+        VStack(spacing: PartySpacing.standard) {
+            HStack(spacing: PartySpacing.medium) {
+                Image(systemName: PartyIcon.challenge.systemName)
+                    .font(.system(size: 22, weight: .bold))
+                    .foregroundStyle(Color.partyCoral)
+                    .frame(width: 32)
+
+                VStack(alignment: .leading, spacing: PartySpacing.xSmall) {
                     Text("Задания")
-                        .font(.title3)
+                        .font(PartyTypography.body.weight(.semibold))
                     Text("при объяснении слов")
-                        .font(.footnote)
+                        .font(PartyTypography.caption)
+                        .foregroundStyle(Color.partySecondaryText)
                 }
-                Spacer(minLength: 0)
-                VStack {
+
+                Spacer()
+
+                VStack(spacing: PartySpacing.xSmall) {
                     Text(viewModel.challenge.smile)
-                        .font(.largeTitle)
+                        .font(PartyTypography.section)
                     Text(viewModel.challenge.title)
-                        .font(.footnote)
+                        .font(PartyTypography.caption)
+                        .foregroundStyle(Color.partySecondaryText)
                 }
             }
 
             Slider(
                 value: Binding(
                     get: { viewModel.challenge.rawValue },
-                    set: { newValue in
-                        viewModel.challenge = Challenge.from(newValue)
-                    }
+                    set: { viewModel.challenge = Challenge.from($0) }
                 ),
                 in: Challenge.off.rawValue...Challenge.always.rawValue,
                 step: 1
             )
-            .padding(.horizontal, 30)
+            .tint(.partyCoral)
         }
+        .partyCard()
     }
 
     private var challengeSelectionView: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: PartySpacing.small) {
             DisclosureGroup(isExpanded: $isChallengePickerExpanded) {
-                VStack(spacing: 12) {
+                VStack(spacing: PartySpacing.medium) {
                     HStack {
-                        Button("Выбрать все") {
-                            viewModel.selectAllChallenges()
-                        }
+                        Button("Выбрать все", action: viewModel.selectAllChallenges)
                         Spacer()
-                        Button("Очистить") {
-                            viewModel.clearChallenges()
-                        }
+                        Button("Очистить", action: viewModel.clearChallenges)
                     }
-                    .font(.footnote.weight(.semibold))
+                    .font(PartyTypography.caption.weight(.semibold))
+                    .foregroundStyle(Color.partyLime)
 
                     ForEach(viewModel.availableChallenges) { challenge in
                         challengeRow(challenge)
                     }
                 }
-                .padding(.top, 12)
+                .padding(.top, PartySpacing.medium)
             } label: {
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Выбор заданий")
-                            .font(.title3)
-                        Text("Выбрано: \(viewModel.selectedChallenges.count) из \(viewModel.availableChallenges.count)")
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
+                VStack(alignment: .leading, spacing: PartySpacing.xSmall) {
+                    Text("Выбор заданий")
+                        .font(PartyTypography.body.weight(.semibold))
+                    Text("Выбрано: \(viewModel.selectedChallenges.count) из \(viewModel.availableChallenges.count)")
+                        .font(PartyTypography.caption)
+                        .foregroundStyle(Color.partySecondaryText)
                 }
             }
-            .tint(.veryPeri)
+            .tint(.partyPrimaryAction)
             .disabled(viewModel.challenge == .off)
-            .opacity(viewModel.challenge == .off ? 0.5 : 1)
+            .opacity(viewModel.challenge == .off ? 0.48 : 1)
 
             if viewModel.challenge != .off && viewModel.selectedChallenges.isEmpty {
                 Text("Выберите хотя бы одно задание")
-                    .font(.footnote)
-                    .foregroundStyle(.red)
+                    .font(PartyTypography.caption)
+                    .foregroundStyle(Color.partyDanger)
             }
         }
+        .partyCard(accent: viewModel.canContinue ? nil : .partyDanger)
     }
 
     private func challengeRow(_ challenge: GameChallenge) -> some View {
         Button {
             viewModel.toggleChallenge(challenge)
         } label: {
-            HStack(spacing: 12) {
+            HStack(spacing: PartySpacing.medium) {
                 Image(systemName: challenge.symbolName)
                     .frame(width: 28)
-                    .foregroundStyle(.veryPeri)
+                    .foregroundStyle(Color.partyCoral)
 
                 VStack(alignment: .leading, spacing: 3) {
                     Text(challenge.title)
-                        .font(.body.weight(.medium))
+                        .font(PartyTypography.body.weight(.medium))
                     Text(challenge.instruction)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .font(PartyTypography.caption)
+                        .foregroundStyle(Color.partySecondaryText)
                         .multilineTextAlignment(.leading)
                 }
 
-                Spacer()
+                Spacer(minLength: PartySpacing.small)
 
                 Image(systemName: viewModel.isChallengeSelected(challenge) ? "checkmark.circle.fill" : "circle")
-                    .foregroundStyle(viewModel.isChallengeSelected(challenge) ? .veryPeri : .secondary)
+                    .foregroundStyle(viewModel.isChallengeSelected(challenge) ? Color.partyLime : Color.partySecondaryText)
             }
+            .frame(minHeight: PartyLayout.minimumTouchTarget)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
     }
-    
-    private func someSwitchView(
+
+    private func switchView(
         title: String,
         subtitle: String,
         switchValue: Binding<Bool>
     ) -> some View {
-        HStack {
-            Toggle(isOn: switchValue, label: {
-                VStack(alignment: .leading) {
-                    Text(title)
-                        .font(.title3)
-                    Text(subtitle)
-                        .font(.footnote)
-                }
-            })
-            .tint(.veryPeri)
+        Toggle(isOn: switchValue) {
+            VStack(alignment: .leading, spacing: PartySpacing.xSmall) {
+                Text(title)
+                    .font(PartyTypography.body.weight(.semibold))
+                Text(subtitle)
+                    .font(PartyTypography.caption)
+                    .foregroundStyle(Color.partySecondaryText)
+            }
         }
+        .tint(.partyLime)
+        .partyCard()
     }
 }
 
-#Preview {
-    SettingsView(viewModel: .init(teams: []))
-}
+#if DEBUG
+    #Preview {
+        SettingsView(viewModel: .init(teams: []))
+    }
+#endif

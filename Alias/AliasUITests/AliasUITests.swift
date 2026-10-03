@@ -22,12 +22,25 @@ final class AliasUITests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func testExample() throws {
-        // UI tests must launch the application that they test.
+    func testContinueRemainsVisibleButDisabledWithoutSavedGame() throws {
         let app = XCUIApplication()
+        app.launchArguments = ["-uiTestResetSavedGame"]
         app.launch()
 
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+        let continueButton = app.buttons["entrance.1"]
+        XCTAssertTrue(continueButton.waitForExistence(timeout: 3))
+        XCTAssertTrue(continueButton.label.contains("Continue Game"))
+        XCTAssertFalse(continueButton.isEnabled)
+
+        let newGameButton = app.buttons["entrance.2"]
+        XCTAssertTrue(newGameButton.exists)
+        XCTAssertTrue(newGameButton.label.contains("New Game"))
+        XCTAssertTrue(newGameButton.isEnabled)
+
+        let rulesButton = app.buttons["entrance.3"]
+        XCTAssertTrue(rulesButton.exists)
+        XCTAssertTrue(rulesButton.label.contains("Rules"))
+        XCTAssertTrue(rulesButton.isEnabled)
     }
 
     func testLaunchPerformance() throws {

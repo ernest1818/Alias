@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 final class MakeCommandViewModel: ObservableObject {
     private let router = Router.shared
     @Published var commandNames: [Team] = [

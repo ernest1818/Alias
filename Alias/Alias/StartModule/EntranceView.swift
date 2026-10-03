@@ -1,75 +1,75 @@
-//
-//  ContentView.swift
-//  Alias
-//
-//  Created by Ernest Avagovich on 16.01.2025.
-//
-
 import SwiftUI
-struct EntranceGroup: Identifiable {
-    let id: Int
-    let name: String
-    let route: Route
-}
 
 struct EntranceView: View {
-    
     @ObservedObject var viewModel: EntranceViewModel
-    
+
     var body: some View {
-            VStack {
+        VStack(spacing: PartySpacing.standard) {
+            ZStack {
+                Circle().fill(Color.partyPrimaryAction)
+                Circle()
+                    .stroke(Color.partyLime, lineWidth: 4)
+                    .padding(6)
                 Text("Alias")
-                    .foregroundStyle(.white)
-                    .font(.superCrownXXL)
-                    .padding(40)
-                    .shadow(color: .black.opacity(0.3), radius: 1, x: 0, y: 6)
-                    .background {
-                        Circle()
-                            .stroke(Color.white, lineWidth: 4)
-                        
-                            
-//                            .clipShape(Circle())
-                        
-                    }
-                    .background{
-                        ZStack {
-                            Color.greenButtonBackground
-                            Group {
-                                Circle()
-                                    .fill(.greenRight)
-                                    .overlay(content: {
-                                        Rectangle()
-                                            .fill(Color(.greenLeft))
-                                            .rotationEffect(.degrees(55))
-                                            .frame(width: 200, height: 200)
-                                            .offset(x: -90, y: 40)
-                                    })
-                                    
-                                    .clipShape(Circle())
-                            }
-                                    .offset(y: -10)
-                        }
-                        .clipShape(Circle())
-                        .shadow(color: .black.opacity(0.3), radius: 1, x: 0, y: 8)
-                        
-                    }
-                    
-                
-                
-                Spacer()
-                ForEach(viewModel.menus, id: \.name) { name in
-                    AliasButton(action: {
-                        viewModel.router.add(route: name.route)
-                    }, title: name.name)
-                    .padding(.top, 10)
-                }
-                
+                    .foregroundStyle(Color.partyPrimaryText)
+                    .font(PartyTypography.display)
+                    .minimumScaleFactor(0.7)
             }
-            .padding()
-            .gradientBackground()
+            .frame(width: 176, height: 176)
+            .shadow(color: Color.partyPrimaryAction.opacity(0.5), radius: 24, y: 12)
+            .padding(.top, PartySpacing.xxLarge)
+
+            Spacer()
+
+            ForEach(viewModel.menus) { item in
+                Group {
+                    if item.action == .rules {
+                        menuButton(for: item)
+                            .buttonStyle(PartySecondaryButtonStyle())
+                    } else {
+                        menuButton(for: item)
+                            .buttonStyle(PartyPrimaryButtonStyle())
+                    }
+                }
+                .disabled(item.action == .continueGame && !viewModel.hasSavedGame)
+                .accessibilityIdentifier("entrance.\(item.id)")
+            }
+            .frame(maxWidth: PartyLayout.maximumContentWidth)
         }
+        .padding(PartySpacing.large)
+        .gradientBackground()
+        .onAppear(perform: viewModel.refreshSaveAvailability)
+        .alert(
+            "Заменить сохранённую игру?",
+            isPresented: Binding(
+                get: { viewModel.isShowingReplacementConfirmation },
+                set: { if !$0 { viewModel.cancelNewGameReplacement() } }
+            )
+        ) {
+            Button("Отмена", role: .cancel, action: viewModel.cancelNewGameReplacement)
+            Button("Заменить", role: .destructive, action: viewModel.confirmNewGameReplacement)
+        } message: {
+            Text("Текущая незавершённая игра будет удалена.")
+        }
+    }
+
+    private func icon(for action: EntranceMenuAction) -> PartyIcon {
+        switch action {
+        case .continueGame: return .play
+        case .newGame: return .add
+        case .rules: return .rules
+        }
+    }
+
+    private func menuButton(for item: EntranceGroup) -> some View {
+        Button(action: { viewModel.select(item.action) }) {
+            Label(item.name, systemImage: icon(for: item.action).systemName)
+        }
+    }
 }
 
-#Preview {
-    EntranceView(viewModel: EntranceViewModel())
-}
+#if DEBUG
+    #Preview {
+        EntranceView(viewModel: EntranceViewModel())
+    }
+#endif
