@@ -75,6 +75,73 @@ final class CardImpactFoundationsTests: XCTestCase {
     }
 }
 
+final class CardImpactControlsTests: XCTestCase {
+    func testSetupSemanticVariantsMatchApprovedContract() {
+        XCTAssertEqual(TeamVisualStyle.allCases.map(\.rawValue), [0, 1, 2, 3, 4])
+        XCTAssertEqual(
+            Challenge.allCases.map(\.cardImpactTitle),
+            ["ВЫКЛ", "РЕДКО", "ЧАСТО", "ВСЕГДА"]
+        )
+        XCTAssertEqual(ValueStepperKind.targetScore.accessibilityTitle, "Слов до победы")
+        XCTAssertEqual(ValueStepperKind.roundDuration.accessibilityTitle, "Длительность раунда")
+    }
+
+    func testValueStepperClampsAtBothBounds() {
+        XCTAssertEqual(
+            ValueStepperCard.clampedValue(20, changingBy: -5, within: 20...200),
+            20
+        )
+        XCTAssertEqual(
+            ValueStepperCard.clampedValue(200, changingBy: 5, within: 20...200),
+            200
+        )
+        XCTAssertEqual(
+            ValueStepperCard.clampedValue(60, changingBy: 5, within: 20...200),
+            65
+        )
+    }
+
+    func testDisplayModelsKeepStableIdentityAndSemanticStyle() {
+        let id = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
+        let model = TeamIdentityDisplayModel(
+            id: id,
+            name: "Сверхзвуковые еноты",
+            style: .violetStripe
+        )
+
+        XCTAssertEqual(model.id, id)
+        XCTAssertEqual(model.name, "Сверхзвуковые еноты")
+        XCTAssertEqual(model.style, .violetStripe)
+    }
+
+    @MainActor
+    func testControlsGalleryRendersDeviceAndAccessibilityVariants() throws {
+        let variants: [(name: String, size: CGSize, dynamicTypeSize: DynamicTypeSize)] = [
+            ("compact", CGSize(width: 375, height: 5_600), .large),
+            ("standard", CGSize(width: 393, height: 5_600), .large),
+            ("large", CGSize(width: 430, height: 5_600), .large),
+            ("accessibility-3", CGSize(width: 393, height: 7_200), .accessibility3)
+        ]
+
+        for variant in variants {
+            let renderer = ImageRenderer(
+                content: CardImpactControlsGallery(isScrollable: false)
+                    .environment(\.dynamicTypeSize, variant.dynamicTypeSize)
+                    .frame(width: variant.size.width, height: variant.size.height)
+            )
+            renderer.scale = 1
+
+            let image = try XCTUnwrap(renderer.uiImage)
+            XCTAssertEqual(image.size, variant.size)
+
+            let attachment = XCTAttachment(image: image)
+            attachment.name = "card-impact-controls-\(variant.name)"
+            attachment.lifetime = .keepAlways
+            add(attachment)
+        }
+    }
+}
+
 final class PartyPopDesignSystemTests: XCTestCase {
     func testSemanticColorTokensMatchApprovedPalette() {
         XCTAssertEqual(
