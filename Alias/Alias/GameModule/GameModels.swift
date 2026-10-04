@@ -339,9 +339,23 @@ final class SavedGameRecord {
 
 @MainActor
 protocol GameSessionStore: AnyObject {
+    func inspectActive() throws -> GameSessionInspection
     func loadActive() -> GameSessionSnapshot?
     func saveActive(_ snapshot: GameSessionSnapshot) throws
     func deleteActive() throws
+}
+
+enum GameSessionInspection: Equatable {
+    case none
+    case available(GameSessionSnapshot)
+    case invalid
+}
+
+extension GameSessionStore {
+    func inspectActive() throws -> GameSessionInspection {
+        guard let snapshot = loadActive() else { return .none }
+        return snapshot.isValid ? .available(snapshot) : .invalid
+    }
 }
 
 @MainActor
@@ -365,18 +379,27 @@ final class SwiftDataGameSessionStore: GameSessionStore {
         self.now = now
     }
 
-    func loadActive() -> GameSessionSnapshot? {
-        do {
-            let records = try activeRecords()
-            guard let record = records.max(by: { $0.updatedAt < $1.updatedAt }),
-                  record.schemaVersion == GameSessionSnapshot.currentVersion
-            else { return nil }
-
-            let snapshot = try JSONDecoder().decode(GameSessionSnapshot.self, from: record.payload)
-            return snapshot.isValid ? snapshot : nil
-        } catch {
-            return nil
+    func inspectActive() throws -> GameSessionInspection {
+        let records = try activeRecords()
+        guard let record = records.max(by: { $0.updatedAt < $1.updatedAt }) else {
+            return .none
         }
+        guard record.schemaVersion == GameSessionSnapshot.currentVersion else {
+            return .invalid
+        }
+
+        guard let snapshot = try? JSONDecoder().decode(GameSessionSnapshot.self, from: record.payload),
+              snapshot.isValid
+        else {
+            return .invalid
+        }
+
+        return .available(snapshot)
+    }
+
+    func loadActive() -> GameSessionSnapshot? {
+        guard case .available(let snapshot) = try? inspectActive() else { return nil }
+        return snapshot
     }
 
     func saveActive(_ snapshot: GameSessionSnapshot) throws {

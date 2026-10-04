@@ -31,12 +31,7 @@ struct AliasApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationStack(path: $router.path) {
-                EntranceView(
-                    viewModel: EntranceViewModel(
-                        router: router,
-                        store: gameSessionStore
-                    )
-                )
+                StageDoorScene(router: router, store: gameSessionStore)
                 .navigationDestination(for: Route.self) { route in
                     destination(for: route)
                 }

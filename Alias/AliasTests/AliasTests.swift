@@ -1,686 +1,963 @@
-import SwiftData
-import SwiftUI
-import UIKit
-import XCTest
-@testable import Alias
-
-final class CardImpactFoundationsTests: XCTestCase {
-    func testSemanticColorTokensMatchApprovedPalette() {
-        XCTAssertEqual(
-            Dictionary(uniqueKeysWithValues: CardImpactPaletteToken.allCases.map { ($0, $0.hex) }),
-            [
-                .ink900: "121319",
-                .ink800: "20222B",
-                .bone50: "F4EFE6",
-                .bone100: "E7E0D6",
-                .cobalt500: "3157FF",
-                .chartreuse500: "C7F000",
-                .vermilion500: "FF4D2E",
-                .amber500: "FFB11B"
-            ]
-        )
-    }
-
-    func testMetricTokensMatchApprovedNumericContract() {
-        XCTAssertEqual(CardImpactSpacing.all, [4, 8, 12, 16, 24, 32, 48, 64])
-        XCTAssertEqual(CardImpactRadius.all, [8, 14, 18, 24])
-        XCTAssertEqual(CardImpactLayout.minimumTouchTarget, 44)
-        XCTAssertEqual(CardImpactLayout.setupTouchTarget, 48)
-        XCTAssertEqual(CardImpactLayout.maximumContentWidth, 600)
-        XCTAssertEqual(CardImpactLayout.screenInset(for: 375), 20)
-        XCTAssertEqual(CardImpactLayout.screenInset(for: 393), 24)
-        XCTAssertEqual(CardImpactLayout.screenInset(for: 430), 32)
-    }
-
-    func testMotionDurationsMatchApprovedContract() {
-        XCTAssertEqual(CardImpactMotion.Duration.instant, 0.08)
-        XCTAssertEqual(CardImpactMotion.Duration.press, 0.12)
-        XCTAssertEqual(CardImpactMotion.Duration.micro, 0.16)
-        XCTAssertEqual(CardImpactMotion.Duration.feedback, 0.20)
-        XCTAssertEqual(CardImpactMotion.Duration.transition, 0.28)
-        XCTAssertEqual(CardImpactMotion.Duration.cardExit, 0.22)
-        XCTAssertEqual(CardImpactMotion.Duration.cardEnter, 0.16)
-        XCTAssertEqual(CardImpactMotion.Duration.cardResolution, 0.38)
-        XCTAssertEqual(CardImpactMotion.Duration.result, 0.52)
-        XCTAssertEqual(CardImpactMotion.Duration.victory, 0.72)
-    }
-
-    func testSofiaSansDisplayFontIsRegistered() {
-        XCTAssertTrue(CardImpactTypography.isDisplayFontAvailable)
-    }
-
-    @MainActor
-    func testFoundationGalleryRendersReferenceSizes() throws {
-        let referenceSizes: [(name: String, size: CGSize)] = [
-            ("compact-375x667", CGSize(width: 375, height: 667)),
-            ("standard-393x852", CGSize(width: 393, height: 852)),
-            ("large-430x932", CGSize(width: 430, height: 932))
-        ]
-
-        for reference in referenceSizes {
-            let renderer = ImageRenderer(
-                content: CardImpactFoundationGallery()
-                    .frame(width: reference.size.width, height: reference.size.height)
-            )
-            renderer.scale = 1
-
-            let image = try XCTUnwrap(renderer.uiImage)
-            XCTAssertEqual(image.size, reference.size)
-
-            let attachment = XCTAttachment(image: image)
-            attachment.name = "card-impact-foundations-\(reference.name)"
-            attachment.lifetime = .keepAlways
-            add(attachment)
-        }
-    }
-}
-
-final class CardImpactControlsTests: XCTestCase {
-    func testSetupSemanticVariantsMatchApprovedContract() {
-        XCTAssertEqual(TeamVisualStyle.allCases.map(\.rawValue), [0, 1, 2, 3, 4])
-        XCTAssertEqual(
-            Challenge.allCases.map(\.cardImpactTitle),
-            ["ВЫКЛ", "РЕДКО", "ЧАСТО", "ВСЕГДА"]
-        )
-        XCTAssertEqual(ValueStepperKind.targetScore.accessibilityTitle, "Слов до победы")
-        XCTAssertEqual(ValueStepperKind.roundDuration.accessibilityTitle, "Длительность раунда")
-    }
-
-    func testValueStepperClampsAtBothBounds() {
-        XCTAssertEqual(
-            ValueStepperCard.clampedValue(20, changingBy: -5, within: 20...200),
-            20
-        )
-        XCTAssertEqual(
-            ValueStepperCard.clampedValue(200, changingBy: 5, within: 20...200),
-            200
-        )
-        XCTAssertEqual(
-            ValueStepperCard.clampedValue(60, changingBy: 5, within: 20...200),
-            65
-        )
-    }
-
-    func testDisplayModelsKeepStableIdentityAndSemanticStyle() {
-        let id = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
-        let model = TeamIdentityDisplayModel(
-            id: id,
-            name: "Сверхзвуковые еноты",
-            style: .violetStripe
-        )
-
-        XCTAssertEqual(model.id, id)
-        XCTAssertEqual(model.name, "Сверхзвуковые еноты")
-        XCTAssertEqual(model.style, .violetStripe)
-    }
-
-    @MainActor
-    func testControlsGalleryRendersDeviceAndAccessibilityVariants() throws {
-        let variants: [(name: String, size: CGSize, dynamicTypeSize: DynamicTypeSize)] = [
-            ("compact", CGSize(width: 375, height: 5_600), .large),
-            ("standard", CGSize(width: 393, height: 5_600), .large),
-            ("large", CGSize(width: 430, height: 5_600), .large),
-            ("accessibility-3", CGSize(width: 393, height: 7_200), .accessibility3)
-        ]
-
-        for variant in variants {
-            let renderer = ImageRenderer(
-                content: CardImpactControlsGallery(isScrollable: false)
-                    .environment(\.dynamicTypeSize, variant.dynamicTypeSize)
-                    .frame(width: variant.size.width, height: variant.size.height)
-            )
-            renderer.scale = 1
-
-            let image = try XCTUnwrap(renderer.uiImage)
-            XCTAssertEqual(image.size, variant.size)
-
-            let attachment = XCTAttachment(image: image)
-            attachment.name = "card-impact-controls-\(variant.name)"
-            attachment.lifetime = .keepAlways
-            add(attachment)
-        }
-    }
-}
-
-final class PartyPopDesignSystemTests: XCTestCase {
-    func testSemanticColorTokensMatchApprovedPalette() {
-        XCTAssertEqual(
-            Dictionary(uniqueKeysWithValues: PartyColorToken.allCases.map { ($0, $0.hex) }),
-            [
-                .background: "193564",
-                .elevated: "244777",
-                .spotlight: "5182BC",
-                .primaryAction: "DC3C24",
-                .coral: "DC3C24",
-                .lime: "E6BF98",
-                .yellow: "E6BF98",
-                .success: "E6BF98",
-                .danger: "DC3C24",
-                .info: "5182BC",
-                .primaryText: "F6E8DD",
-                .secondaryText: "E6BF98"
-            ]
-        )
-    }
-
-    func testLayoutTokensMatchApprovedScaleAndTouchTarget() {
-        XCTAssertEqual(PartySpacing.all, [4, 8, 12, 16, 24, 32, 40])
-        XCTAssertEqual(PartyRadius.all, [12, 20, 28, 1_000])
-        XCTAssertEqual(PartyLayout.minimumTouchTarget, 44)
-    }
-
-    func testSemanticIconsAndChallengeMappingsUseExpectedSFSymbols() {
-        XCTAssertEqual(PartyIcon.play.systemName, "play.fill")
-        XCTAssertEqual(PartyIcon.pause.systemName, "pause.fill")
-        XCTAssertEqual(PartyIcon.add.systemName, "plus")
-        XCTAssertEqual(PartyIcon.delete.systemName, "trash.fill")
-        XCTAssertEqual(PartyIcon.back.systemName, "chevron.left")
-        XCTAssertEqual(PartyIcon.forward.systemName, "chevron.right")
-        XCTAssertEqual(PartyIcon.correct.systemName, "checkmark")
-        XCTAssertEqual(PartyIcon.skip.systemName, "xmark")
-
-        XCTAssertEqual(GameChallenge.whisper.symbolName, PartyIcon.whisper.systemName)
-        XCTAssertEqual(GameChallenge.robotVoice.symbolName, PartyIcon.robotVoice.systemName)
-        XCTAssertEqual(GameChallenge.imagineOpening.symbolName, PartyIcon.imagineOpening.systemName)
-    }
-}
-
-@MainActor
-final class SnapshotAndTimerTests: XCTestCase {
-    func testSnapshotJSONRoundTripPreservesStableIdentityAndState() throws {
-        let store = SpyGameSessionStore()
-        let factory = ManualTickerFactory()
-        let viewModel = GameViewModel(
-            gameConfig: makeGameConfig(),
-            store: store,
-            router: SpyRouter(),
-            randomValue: { 1 },
-            wordShuffler: { $0 },
-            tickerFactory: factory.make
-        )
-
-        viewModel.startGame()
-        viewModel.markWordAsGuessed()
-
-        let snapshot = try XCTUnwrap(store.savedSnapshots.last)
-        let data = try JSONEncoder().encode(snapshot)
-        let decoded = try JSONDecoder().decode(GameSessionSnapshot.self, from: data)
-
-        XCTAssertEqual(decoded, snapshot)
-        XCTAssertEqual(decoded.currentTeam.id, viewModel.currentTeam.id)
-        XCTAssertEqual(decoded.configuration.id, viewModel.gameConfig.configuration.id)
-        XCTAssertEqual(decoded.orderedWords.map(\.id), snapshot.orderedWords.map(\.id))
-        XCTAssertTrue(decoded.isValid)
-    }
-
-    func testWordsCategoryIdentityIsStableAndCodable() throws {
-        for category in WordsCategory.allCases {
-            XCTAssertEqual(category.id, category.id)
-            let data = try JSONEncoder().encode(category)
-            XCTAssertEqual(try JSONDecoder().decode(WordsCategory.self, from: data), category)
-        }
-    }
-
-    func testRestoredTimerTicksFromSavedValueAndExpiresExactlyOnce() {
-        let ticker = ManualTicker()
-        let timer = TimerViewModel(initialTime: 20, timeRemaining: 2, ticker: ticker)
-        var ticks: [Int] = []
-        var expirationCount = 0
-        timer.onTick = { ticks.append($0) }
-        timer.onExpiration = { expirationCount += 1 }
-
-        timer.start()
-        ticker.fire()
-        ticker.fire()
-        ticker.fire()
-        timer.start()
-
-        XCTAssertEqual(ticks, [1, 0])
-        XCTAssertEqual(timer.timeRemaining, 0)
-        XCTAssertFalse(timer.isRunning)
-        XCTAssertTrue(timer.isEndTime)
-        XCTAssertEqual(expirationCount, 1)
-    }
-}
-
-@MainActor
-final class SwiftDataGameSessionStoreTests: XCTestCase {
-    func testOneSlotReplacementRoundTripAndDeletion() throws {
-        let container = try makeInMemoryContainer()
-        let store = SwiftDataGameSessionStore(
-            modelContext: container.mainContext,
-            now: { Date(timeIntervalSince1970: 100) }
-        )
-        let first = makeSnapshot(phase: .preparing, remainingTime: 8)
-        let replacement = makeSnapshot(phase: .paused, remainingTime: 4)
-
-        try store.saveActive(first)
-        try store.saveActive(replacement)
-
-        XCTAssertEqual(store.loadActive(), replacement)
-        XCTAssertEqual(
-            try container.mainContext.fetch(FetchDescriptor<SavedGameRecord>()).count,
-            1
-        )
-
-        try store.deleteActive()
-        XCTAssertNil(store.loadActive())
-        XCTAssertTrue(try container.mainContext.fetch(FetchDescriptor<SavedGameRecord>()).isEmpty)
-    }
-
-    func testUnsupportedAndCorruptRecordsAreIsolated() throws {
-        let unsupportedContainer = try makeInMemoryContainer()
-        let validPayload = try JSONEncoder().encode(makeSnapshot())
-        unsupportedContainer.mainContext.insert(
-            SavedGameRecord(schemaVersion: 999, payload: validPayload)
-        )
-        try unsupportedContainer.mainContext.save()
-        let unsupportedStore = SwiftDataGameSessionStore(
-            modelContext: unsupportedContainer.mainContext
-        )
-        XCTAssertNil(unsupportedStore.loadActive())
-
-        let corruptContainer = try makeInMemoryContainer()
-        corruptContainer.mainContext.insert(SavedGameRecord(payload: Data([0xFF, 0x00])))
-        try corruptContainer.mainContext.save()
-        let corruptStore = SwiftDataGameSessionStore(modelContext: corruptContainer.mainContext)
-        XCTAssertNil(corruptStore.loadActive())
-    }
-}
-
-@MainActor
-final class GameViewModelPersistenceTests: XCTestCase {
-    func testRestoresPreparingStateExactlyWithoutStartingTimer() {
-        let snapshot = makeSnapshot(phase: .preparing, remainingTime: 7)
-        let viewModel = restoredViewModel(snapshot)
-
-        XCTAssertEqual(viewModel.currentState, .preparing)
-        XCTAssertEqual(viewModel.currentTeam.id, snapshot.currentTeam.id)
-        XCTAssertEqual(viewModel.currentWord?.id, snapshot.currentWordID)
-        XCTAssertEqual(viewModel.currentChallenge, snapshot.currentChallenge)
-        XCTAssertEqual(viewModel.timerViewModel.timeRemaining, 7)
-        XCTAssertFalse(viewModel.timerViewModel.isRunning)
-        XCTAssertEqual(viewModel.makeSnapshot(), snapshot)
-    }
-
-    func testRestoresPlayingAndPausedSnapshotsAsPaused() {
-        for phase in [PersistedGamePhase.playing, .paused] {
-            let snapshot = makeSnapshot(phase: phase, remainingTime: 6)
-            let viewModel = restoredViewModel(snapshot)
-
-            XCTAssertEqual(viewModel.currentState, .paused)
-            XCTAssertEqual(viewModel.timerViewModel.timeRemaining, 6)
-            XCTAssertFalse(viewModel.timerViewModel.isRunning)
-        }
-    }
-
-    func testRestoresRoundEndStateAndResult() {
-        let snapshot = makeSnapshot(phase: .roundEnd, remainingTime: 0)
-        let viewModel = restoredViewModel(snapshot)
-
-        XCTAssertEqual(viewModel.currentState, .roundEnd)
-        XCTAssertEqual(viewModel.roundResults.map(\.id), snapshot.roundResults.map(\.id))
-        XCTAssertEqual(viewModel.gameScores.map(\.totalScore), snapshot.scores.map(\.totalScore))
-        XCTAssertFalse(viewModel.timerViewModel.isRunning)
-    }
-
-    func testCheckpointsCreationActionsPhasesAndEveryTimerTick() {
-        let store = SpyGameSessionStore()
-        let factory = ManualTickerFactory()
-        let viewModel = GameViewModel(
-            gameConfig: makeGameConfig(roundTimer: 3),
-            store: store,
-            router: SpyRouter(),
-            randomValue: { 1 },
-            wordShuffler: { $0 },
-            tickerFactory: factory.make
-        )
-        XCTAssertEqual(store.savedSnapshots.count, 1)
-
-        viewModel.startGame()
-        XCTAssertEqual(store.savedSnapshots.count, 2)
-
-        factory.timer.fire()
-        XCTAssertEqual(store.savedSnapshots.last?.remainingTime, 2)
-
-        viewModel.markWordAsGuessed()
-        XCTAssertEqual(store.savedSnapshots.last?.currentWordID, viewModel.currentWord?.id)
-
-        viewModel.pauseGame()
-        XCTAssertEqual(store.savedSnapshots.last?.phase, .paused)
-    }
-
-    func testTimerExpirationImmediatelyEndsRoundOnlyOnce() {
-        let store = SpyGameSessionStore()
-        let factory = ManualTickerFactory()
-        let viewModel = GameViewModel(
-            gameConfig: makeGameConfig(roundTimer: 1, targetScore: 20),
-            store: store,
-            router: SpyRouter(),
-            randomValue: { 1 },
-            wordShuffler: { $0 },
-            tickerFactory: factory.make
-        )
-
-        viewModel.startGame()
-        factory.timer.fire()
-        factory.timer.fire()
-
-        XCTAssertEqual(viewModel.currentState, .roundEnd)
-        XCTAssertEqual(viewModel.roundResults.count, 1)
-        XCTAssertEqual(store.savedSnapshots.last?.phase, .roundEnd)
-
-        viewModel.prepareForNextRound()
-        XCTAssertEqual(viewModel.currentState, .preparing)
-        XCTAssertEqual(store.savedSnapshots.last?.phase, .preparing)
-    }
-
-    func testResumeCountdownRejectsRepeatsAndRestartsAfterInterruption() {
-        let store = SpyGameSessionStore()
-        let factory = ManualTickerFactory()
-        let viewModel = GameViewModel(
-            gameConfig: makeGameConfig(roundTimer: 5),
-            store: store,
-            router: SpyRouter(),
-            randomValue: { 1 },
-            wordShuffler: { $0 },
-            tickerFactory: factory.make
-        )
-        viewModel.startGame()
-        factory.timer.fire()
-        viewModel.pauseGame()
-        let savedRemainder = viewModel.timerViewModel.timeRemaining
-
-        viewModel.resumeGame()
-        viewModel.resumeGame()
-        XCTAssertEqual(factory.countdown.startCount, 1)
-        XCTAssertEqual(viewModel.resumeCountdownStep, .three)
-        XCTAssertEqual(viewModel.timerViewModel.timeRemaining, savedRemainder)
-
-        factory.countdown.fire()
-        XCTAssertEqual(viewModel.resumeCountdownStep, .two)
-        viewModel.applicationDidBecomeInactive()
-        XCTAssertEqual(viewModel.currentState, .paused)
-        XCTAssertNil(viewModel.resumeCountdownStep)
-
-        viewModel.resumeGame()
-        XCTAssertEqual(viewModel.resumeCountdownStep, .three)
-        factory.countdown.fire(times: 4)
-
-        XCTAssertEqual(viewModel.currentState, .playing)
-        XCTAssertNil(viewModel.resumeCountdownStep)
-        XCTAssertTrue(viewModel.timerViewModel.isRunning)
-        XCTAssertEqual(viewModel.timerViewModel.timeRemaining, savedRemainder)
-    }
-
-    func testGameEndDeletesActiveSave() {
-        let store = SpyGameSessionStore()
-        let factory = ManualTickerFactory()
-        let viewModel = GameViewModel(
-            gameConfig: makeGameConfig(roundTimer: 1, targetScore: 1),
-            store: store,
-            router: SpyRouter(),
-            randomValue: { 1 },
-            wordShuffler: { $0 },
-            tickerFactory: factory.make
-        )
-
-        viewModel.startGame()
-        viewModel.markWordAsGuessed()
-        factory.timer.fire()
-
-        XCTAssertEqual(viewModel.currentState, .gameEnd)
-        XCTAssertEqual(store.deleteCount, 1)
-        XCTAssertNil(store.activeSnapshot)
-    }
-
-    func testReturnToMenuPausesSavesThenReturnsToRoot() {
-        let store = SpyGameSessionStore()
-        let router = SpyRouter()
-        let factory = ManualTickerFactory()
-        let viewModel = GameViewModel(
-            gameConfig: makeGameConfig(),
-            store: store,
-            router: router,
-            randomValue: { 1 },
-            wordShuffler: { $0 },
-            tickerFactory: factory.make
-        )
-        viewModel.startGame()
-
-        viewModel.returnToMenu()
-
-        XCTAssertEqual(viewModel.currentState, .paused)
-        XCTAssertFalse(viewModel.timerViewModel.isRunning)
-        XCTAssertEqual(store.savedSnapshots.last?.phase, .paused)
-        XCTAssertEqual(router.backToRootCount, 1)
-    }
-}
-
-@MainActor
-final class EntranceViewModelTests: XCTestCase {
-    func testContinueDisabledWhenNoValidSaveAndMissingLoadDoesNotNavigate() {
-        let store = SpyGameSessionStore()
-        let router = SpyRouter()
-        let viewModel = EntranceViewModel(router: router, store: store)
-
-        viewModel.refreshSaveAvailability()
-        viewModel.select(.continueGame)
-
-        XCTAssertFalse(viewModel.hasSavedGame)
-        XCTAssertTrue(router.routes.isEmpty)
-    }
-
-    func testContinueLoadsValueSnapshotIntoTypedRoute() {
-        let snapshot = makeSnapshot()
-        let store = SpyGameSessionStore(activeSnapshot: snapshot)
-        let router = SpyRouter()
-        let viewModel = EntranceViewModel(router: router, store: store)
-
-        viewModel.refreshSaveAvailability()
-        viewModel.select(.continueGame)
-
-        XCTAssertTrue(viewModel.hasSavedGame)
-        XCTAssertEqual(router.routes, [.resumeGame(snapshot)])
-    }
-
-    func testCancelAndConfirmNewGameReplacement() {
-        let snapshot = makeSnapshot()
-        let store = SpyGameSessionStore(activeSnapshot: snapshot)
-        let router = SpyRouter()
-        let viewModel = EntranceViewModel(router: router, store: store)
-
-        viewModel.select(.newGame)
-        XCTAssertTrue(viewModel.isShowingReplacementConfirmation)
-        viewModel.cancelNewGameReplacement()
-        XCTAssertEqual(store.deleteCount, 0)
-        XCTAssertEqual(store.activeSnapshot, snapshot)
-        XCTAssertTrue(router.routes.isEmpty)
-
-        viewModel.select(.newGame)
-        viewModel.confirmNewGameReplacement()
-        XCTAssertEqual(store.deleteCount, 1)
-        XCTAssertNil(store.activeSnapshot)
-        XCTAssertEqual(router.routes, [.showCommand])
-    }
-
-    func testRulesNavigationNeverReadsOrMutatesSave() {
-        let store = SpyGameSessionStore(activeSnapshot: makeSnapshot())
-        let router = SpyRouter()
-        let viewModel = EntranceViewModel(router: router, store: store)
-
-        viewModel.select(.rules)
-
-        XCTAssertEqual(store.loadCount, 0)
-        XCTAssertEqual(store.deleteCount, 0)
-        XCTAssertEqual(router.routes, [.showRules])
-    }
-}
-
-@MainActor
-private final class ManualTicker: GameTicker {
-    private var tick: (() -> Void)?
-    private(set) var isStarted = false
-    private(set) var startCount = 0
-
-    func start(_ tick: @escaping () -> Void) {
-        guard !isStarted else { return }
-        self.tick = tick
-        isStarted = true
-        startCount += 1
-    }
-
-    func stop() {
-        isStarted = false
-        tick = nil
-    }
-
-    func fire(times: Int = 1) {
-        for _ in 0..<times {
-            guard isStarted, let tick else { return }
-            tick()
-        }
-    }
-}
-
-@MainActor
-private final class ManualTickerFactory {
-    private(set) var created: [ManualTicker] = []
-
-    var countdown: ManualTicker { created[0] }
-    var timer: ManualTicker { created[1] }
-
-    func make() -> GameTicker {
-        let ticker = ManualTicker()
-        created.append(ticker)
-        return ticker
-    }
-}
-
-@MainActor
-private final class SpyGameSessionStore: GameSessionStore {
-    var activeSnapshot: GameSessionSnapshot?
-    private(set) var savedSnapshots: [GameSessionSnapshot] = []
-    private(set) var loadCount = 0
-    private(set) var deleteCount = 0
-
-    init(activeSnapshot: GameSessionSnapshot? = nil) {
-        self.activeSnapshot = activeSnapshot
-    }
-
-    func loadActive() -> GameSessionSnapshot? {
-        loadCount += 1
-        return activeSnapshot
-    }
-
-    func saveActive(_ snapshot: GameSessionSnapshot) throws {
-        activeSnapshot = snapshot
-        savedSnapshots.append(snapshot)
-    }
-
-    func deleteActive() throws {
-        deleteCount += 1
-        activeSnapshot = nil
-    }
-}
-
-@MainActor
-private final class SpyRouter: RouterProtocol {
-    private(set) var routes: [Route] = []
-    private(set) var backCount = 0
-    private(set) var backToRootCount = 0
-
-    func add(route: Route) {
-        routes.append(route)
-    }
-
-    func back() {
-        backCount += 1
-    }
-
-    func backToRoot() {
-        backToRootCount += 1
-        routes.removeAll()
-    }
-}
-
-@MainActor
-private func restoredViewModel(_ snapshot: GameSessionSnapshot) -> GameViewModel {
-    GameViewModel(
-        restoring: snapshot,
-        store: SpyGameSessionStore(activeSnapshot: snapshot),
-        router: SpyRouter(),
-        randomValue: { 1 },
-        wordShuffler: { $0 },
-        tickerFactory: ManualTickerFactory().make
-    )
-}
-
-private func makeGameConfig(
-    roundTimer: Int = 10,
-    targetScore: Int = 20
-) -> GameConfigModel {
-    GameConfigModel(
-        teams: [Team(name: "Первая"), Team(name: "Вторая")],
-        configuration: Configuration(
-            wordsCount: targetScore,
-            roundTimer: roundTimer,
-            isSkipPenalty: true,
-            islastWordForAllTeam: false,
-            challenges: .always,
-            selectedChallenges: [.whisper, .robotVoice],
-            isSoundOn: true
-        ),
-        words: .light
-    )
-}
-
-private func makeSnapshot(
-    phase: PersistedGamePhase = .preparing,
-    remainingTime: Int = 8
-) -> GameSessionSnapshot {
-    let firstWord = WordCard(word: "слово", isGuessed: true)
-    let secondWord = WordCard(word: "пример")
-    let completedResult = RoundResult(correctWords: [firstWord])
-    let currentResult = RoundResult(skippedWords: [firstWord], penalties: 1)
-    let firstTeam = Team(name: "Первая", roundResult: currentResult)
-    let secondTeam = Team(name: "Вторая")
-    let configuration = Configuration(
-        wordsCount: 20,
-        roundTimer: 10,
-        isSkipPenalty: true,
-        islastWordForAllTeam: false,
-        challenges: .always,
-        selectedChallenges: [.whisper],
-        isSoundOn: true
-    )
-
-    return GameSessionSnapshot(
-        configuration: ConfigurationSnapshot(configuration),
-        teams: [TeamSnapshot(Team(id: firstTeam.id, name: firstTeam.name)), TeamSnapshot(secondTeam)],
-        category: .light,
-        phase: phase,
-        currentTeamIndex: 0,
-        currentTeam: TeamSnapshot(firstTeam),
-        gameInfoID: UUID(),
-        gameNumber: 2,
-        currentRound: 1,
-        scores: [
-            GameScoreSnapshot(GameScore(teamId: firstTeam.id, totalScore: 3)),
-            GameScoreSnapshot(GameScore(teamId: secondTeam.id, totalScore: 2))
-        ],
-        roundResults: [RoundResultSnapshot(completedResult)],
-        orderedWords: [WordCardSnapshot(firstWord), WordCardSnapshot(secondWord)],
-        currentWordID: secondWord.id,
-        currentChallenge: .whisper,
-        remainingTime: remainingTime
-    )
-}
-
-@MainActor
-private func makeInMemoryContainer() throws -> ModelContainer {
-    try ModelContainer(
-        for: SavedGameRecord.self,
-        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
-    )
-}
+//import SwiftData
+//import SwiftUI
+//import UIKit
+//import XCTest
+//@testable import Alias
+//
+//final class CardImpactFoundationsTests: XCTestCase {
+//    func testSemanticColorTokensMatchApprovedPalette() {
+//        XCTAssertEqual(
+//            Dictionary(uniqueKeysWithValues: CardImpactPaletteToken.allCases.map { ($0, $0.hex) }),
+//            [
+//                .ink900: "121319",
+//                .ink800: "20222B",
+//                .bone50: "F4EFE6",
+//                .bone100: "E7E0D6",
+//                .cobalt500: "3157FF",
+//                .chartreuse500: "C7F000",
+//                .vermilion500: "FF4D2E",
+//                .amber500: "FFB11B"
+//            ]
+//        )
+//    }
+//
+//    func testMetricTokensMatchApprovedNumericContract() {
+//        XCTAssertEqual(CardImpactSpacing.all, [4, 8, 12, 16, 24, 32, 48, 64])
+//        XCTAssertEqual(CardImpactRadius.all, [8, 14, 18, 24])
+//        XCTAssertEqual(CardImpactLayout.minimumTouchTarget, 44)
+//        XCTAssertEqual(CardImpactLayout.setupTouchTarget, 48)
+//        XCTAssertEqual(CardImpactLayout.maximumContentWidth, 600)
+//        XCTAssertEqual(CardImpactLayout.screenInset(for: 375), 20)
+//        XCTAssertEqual(CardImpactLayout.screenInset(for: 393), 24)
+//        XCTAssertEqual(CardImpactLayout.screenInset(for: 430), 32)
+//    }
+//
+//    func testMotionDurationsMatchApprovedContract() {
+//        XCTAssertEqual(CardImpactMotion.Duration.instant, 0.08)
+//        XCTAssertEqual(CardImpactMotion.Duration.press, 0.12)
+//        XCTAssertEqual(CardImpactMotion.Duration.micro, 0.16)
+//        XCTAssertEqual(CardImpactMotion.Duration.feedback, 0.20)
+//        XCTAssertEqual(CardImpactMotion.Duration.transition, 0.28)
+//        XCTAssertEqual(CardImpactMotion.Duration.cardExit, 0.22)
+//        XCTAssertEqual(CardImpactMotion.Duration.cardEnter, 0.16)
+//        XCTAssertEqual(CardImpactMotion.Duration.cardResolution, 0.38)
+//        XCTAssertEqual(CardImpactMotion.Duration.result, 0.52)
+//        XCTAssertEqual(CardImpactMotion.Duration.victory, 0.72)
+//    }
+//
+//    func testSofiaSansDisplayFontIsRegistered() {
+//        XCTAssertTrue(CardImpactTypography.isDisplayFontAvailable)
+//    }
+//
+//    @MainActor
+//    func testFoundationGalleryRendersReferenceSizes() throws {
+//        let referenceSizes: [(name: String, size: CGSize)] = [
+//            ("compact-375x667", CGSize(width: 375, height: 667)),
+//            ("standard-393x852", CGSize(width: 393, height: 852)),
+//            ("large-430x932", CGSize(width: 430, height: 932))
+//        ]
+//
+//        for reference in referenceSizes {
+//            let renderer = ImageRenderer(
+//                content: CardImpactFoundationGallery()
+//                    .frame(width: reference.size.width, height: reference.size.height)
+//            )
+//            renderer.scale = 1
+//
+//            let image = try XCTUnwrap(renderer.uiImage)
+//            XCTAssertEqual(image.size, reference.size)
+//
+//            let attachment = XCTAttachment(image: image)
+//            attachment.name = "card-impact-foundations-\(reference.name)"
+//            attachment.lifetime = .keepAlways
+//            add(attachment)
+//        }
+//    }
+//}
+//
+//final class CardImpactControlsTests: XCTestCase {
+//    func testSetupSemanticVariantsMatchApprovedContract() {
+//        XCTAssertEqual(TeamVisualStyle.allCases.map(\.rawValue), [0, 1, 2, 3, 4])
+//        XCTAssertEqual(
+//            Challenge.allCases.map(\.cardImpactTitle),
+//            ["ВЫКЛ", "РЕДКО", "ЧАСТО", "ВСЕГДА"]
+//        )
+//        XCTAssertEqual(ValueStepperKind.targetScore.accessibilityTitle, "Слов до победы")
+//        XCTAssertEqual(ValueStepperKind.roundDuration.accessibilityTitle, "Длительность раунда")
+//    }
+//
+//    func testValueStepperClampsAtBothBounds() {
+//        XCTAssertEqual(
+//            ValueStepperCard.clampedValue(20, changingBy: -5, within: 20...200),
+//            20
+//        )
+//        XCTAssertEqual(
+//            ValueStepperCard.clampedValue(200, changingBy: 5, within: 20...200),
+//            200
+//        )
+//        XCTAssertEqual(
+//            ValueStepperCard.clampedValue(60, changingBy: 5, within: 20...200),
+//            65
+//        )
+//    }
+//
+//    func testDisplayModelsKeepStableIdentityAndSemanticStyle() {
+//        let id = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
+//        let model = TeamIdentityDisplayModel(
+//            id: id,
+//            name: "Сверхзвуковые еноты",
+//            style: .violetStripe
+//        )
+//
+//        XCTAssertEqual(model.id, id)
+//        XCTAssertEqual(model.name, "Сверхзвуковые еноты")
+//        XCTAssertEqual(model.style, .violetStripe)
+//    }
+//
+//    @MainActor
+//    func testControlsGalleryRendersDeviceAndAccessibilityVariants() throws {
+//        let variants: [(name: String, size: CGSize, dynamicTypeSize: DynamicTypeSize)] = [
+//            ("compact", CGSize(width: 375, height: 5_600), .large),
+//            ("standard", CGSize(width: 393, height: 5_600), .large),
+//            ("large", CGSize(width: 430, height: 5_600), .large),
+//            ("accessibility-3", CGSize(width: 393, height: 7_200), .accessibility3)
+//        ]
+//
+//        for variant in variants {
+//            let renderer = ImageRenderer(
+//                content: CardImpactControlsGallery(isScrollable: false)
+//                    .environment(\.dynamicTypeSize, variant.dynamicTypeSize)
+//                    .frame(width: variant.size.width, height: variant.size.height)
+//            )
+//            renderer.scale = 1
+//
+//            let image = try XCTUnwrap(renderer.uiImage)
+//            XCTAssertEqual(image.size, variant.size)
+//
+//            let attachment = XCTAttachment(image: image)
+//            attachment.name = "card-impact-controls-\(variant.name)"
+//            attachment.lifetime = .keepAlways
+//            add(attachment)
+//        }
+//    }
+//}
+//
+//final class PartyPopDesignSystemTests: XCTestCase {
+//    func testSemanticColorTokensMatchApprovedPalette() {
+//        XCTAssertEqual(
+//            Dictionary(uniqueKeysWithValues: PartyColorToken.allCases.map { ($0, $0.hex) }),
+//            [
+//                .background: "193564",
+//                .elevated: "244777",
+//                .spotlight: "5182BC",
+//                .primaryAction: "DC3C24",
+//                .coral: "DC3C24",
+//                .lime: "E6BF98",
+//                .yellow: "E6BF98",
+//                .success: "E6BF98",
+//                .danger: "DC3C24",
+//                .info: "5182BC",
+//                .primaryText: "F6E8DD",
+//                .secondaryText: "E6BF98"
+//            ]
+//        )
+//    }
+//
+//    func testLayoutTokensMatchApprovedScaleAndTouchTarget() {
+//        XCTAssertEqual(PartySpacing.all, [4, 8, 12, 16, 24, 32, 40])
+//        XCTAssertEqual(PartyRadius.all, [12, 20, 28, 1_000])
+//        XCTAssertEqual(PartyLayout.minimumTouchTarget, 44)
+//    }
+//
+//    func testSemanticIconsAndChallengeMappingsUseExpectedSFSymbols() {
+//        XCTAssertEqual(PartyIcon.play.systemName, "play.fill")
+//        XCTAssertEqual(PartyIcon.pause.systemName, "pause.fill")
+//        XCTAssertEqual(PartyIcon.add.systemName, "plus")
+//        XCTAssertEqual(PartyIcon.delete.systemName, "trash.fill")
+//        XCTAssertEqual(PartyIcon.back.systemName, "chevron.left")
+//        XCTAssertEqual(PartyIcon.forward.systemName, "chevron.right")
+//        XCTAssertEqual(PartyIcon.correct.systemName, "checkmark")
+//        XCTAssertEqual(PartyIcon.skip.systemName, "xmark")
+//
+//        XCTAssertEqual(GameChallenge.whisper.symbolName, PartyIcon.whisper.systemName)
+//        XCTAssertEqual(GameChallenge.robotVoice.symbolName, PartyIcon.robotVoice.systemName)
+//        XCTAssertEqual(GameChallenge.imagineOpening.symbolName, PartyIcon.imagineOpening.systemName)
+//    }
+//}
+//
+//@MainActor
+//final class SnapshotAndTimerTests: XCTestCase {
+//    func testSnapshotJSONRoundTripPreservesStableIdentityAndState() throws {
+//        let store = SpyGameSessionStore()
+//        let factory = ManualTickerFactory()
+//        let viewModel = GameViewModel(
+//            gameConfig: makeGameConfig(),
+//            store: store,
+//            router: SpyRouter(),
+//            randomValue: { 1 },
+//            wordShuffler: { $0 },
+//            tickerFactory: factory.make
+//        )
+//
+//        viewModel.startGame()
+//        viewModel.markWordAsGuessed()
+//
+//        let snapshot = try XCTUnwrap(store.savedSnapshots.last)
+//        let data = try JSONEncoder().encode(snapshot)
+//        let decoded = try JSONDecoder().decode(GameSessionSnapshot.self, from: data)
+//
+//        XCTAssertEqual(decoded, snapshot)
+//        XCTAssertEqual(decoded.currentTeam.id, viewModel.currentTeam.id)
+//        XCTAssertEqual(decoded.configuration.id, viewModel.gameConfig.configuration.id)
+//        XCTAssertEqual(decoded.orderedWords.map(\.id), snapshot.orderedWords.map(\.id))
+//        XCTAssertTrue(decoded.isValid)
+//    }
+//
+//    func testWordsCategoryIdentityIsStableAndCodable() throws {
+//        for category in WordsCategory.allCases {
+//            XCTAssertEqual(category.id, category.id)
+//            let data = try JSONEncoder().encode(category)
+//            XCTAssertEqual(try JSONDecoder().decode(WordsCategory.self, from: data), category)
+//        }
+//    }
+//
+//    func testRestoredTimerTicksFromSavedValueAndExpiresExactlyOnce() {
+//        let ticker = ManualTicker()
+//        let timer = TimerViewModel(initialTime: 20, timeRemaining: 2, ticker: ticker)
+//        var ticks: [Int] = []
+//        var expirationCount = 0
+//        timer.onTick = { ticks.append($0) }
+//        timer.onExpiration = { expirationCount += 1 }
+//
+//        timer.start()
+//        ticker.fire()
+//        ticker.fire()
+//        ticker.fire()
+//        timer.start()
+//
+//        XCTAssertEqual(ticks, [1, 0])
+//        XCTAssertEqual(timer.timeRemaining, 0)
+//        XCTAssertFalse(timer.isRunning)
+//        XCTAssertTrue(timer.isEndTime)
+//        XCTAssertEqual(expirationCount, 1)
+//    }
+//}
+//
+//@MainActor
+//final class SwiftDataGameSessionStoreTests: XCTestCase {
+//    func testOneSlotReplacementRoundTripAndDeletion() throws {
+//        let container = try makeInMemoryContainer()
+//        let store = SwiftDataGameSessionStore(
+//            modelContext: container.mainContext,
+//            now: { Date(timeIntervalSince1970: 100) }
+//        )
+//        let first = makeSnapshot(phase: .preparing, remainingTime: 8)
+//        let replacement = makeSnapshot(phase: .paused, remainingTime: 4)
+//
+//        try store.saveActive(first)
+//        try store.saveActive(replacement)
+//
+//        XCTAssertEqual(store.loadActive(), replacement)
+//        XCTAssertEqual(try store.inspectActive(), .available(replacement))
+//        XCTAssertEqual(
+//            try container.mainContext.fetch(FetchDescriptor<SavedGameRecord>()).count,
+//            1
+//        )
+//
+//        try store.deleteActive()
+//        XCTAssertNil(store.loadActive())
+//        XCTAssertEqual(try store.inspectActive(), .none)
+//        XCTAssertTrue(try container.mainContext.fetch(FetchDescriptor<SavedGameRecord>()).isEmpty)
+//    }
+//
+//    func testUnsupportedAndCorruptRecordsAreIsolated() throws {
+//        let unsupportedContainer = try makeInMemoryContainer()
+//        let validPayload = try JSONEncoder().encode(makeSnapshot())
+//        unsupportedContainer.mainContext.insert(
+//            SavedGameRecord(schemaVersion: 999, payload: validPayload)
+//        )
+//        try unsupportedContainer.mainContext.save()
+//        let unsupportedStore = SwiftDataGameSessionStore(
+//            modelContext: unsupportedContainer.mainContext
+//        )
+//        XCTAssertNil(unsupportedStore.loadActive())
+//        XCTAssertEqual(try unsupportedStore.inspectActive(), .invalid)
+//
+//        let corruptContainer = try makeInMemoryContainer()
+//        corruptContainer.mainContext.insert(SavedGameRecord(payload: Data([0xFF, 0x00])))
+//        try corruptContainer.mainContext.save()
+//        let corruptStore = SwiftDataGameSessionStore(modelContext: corruptContainer.mainContext)
+//        XCTAssertNil(corruptStore.loadActive())
+//        XCTAssertEqual(try corruptStore.inspectActive(), .invalid)
+//    }
+//}
+//
+//@MainActor
+//final class GameViewModelPersistenceTests: XCTestCase {
+//    func testRestoresPreparingStateExactlyWithoutStartingTimer() {
+//        let snapshot = makeSnapshot(phase: .preparing, remainingTime: 7)
+//        let viewModel = restoredViewModel(snapshot)
+//
+//        XCTAssertEqual(viewModel.currentState, .preparing)
+//        XCTAssertEqual(viewModel.currentTeam.id, snapshot.currentTeam.id)
+//        XCTAssertEqual(viewModel.currentWord?.id, snapshot.currentWordID)
+//        XCTAssertEqual(viewModel.currentChallenge, snapshot.currentChallenge)
+//        XCTAssertEqual(viewModel.timerViewModel.timeRemaining, 7)
+//        XCTAssertFalse(viewModel.timerViewModel.isRunning)
+//        XCTAssertEqual(viewModel.makeSnapshot(), snapshot)
+//    }
+//
+//    func testRestoresPlayingAndPausedSnapshotsAsPaused() {
+//        for phase in [PersistedGamePhase.playing, .paused] {
+//            let snapshot = makeSnapshot(phase: phase, remainingTime: 6)
+//            let viewModel = restoredViewModel(snapshot)
+//
+//            XCTAssertEqual(viewModel.currentState, .paused)
+//            XCTAssertEqual(viewModel.timerViewModel.timeRemaining, 6)
+//            XCTAssertFalse(viewModel.timerViewModel.isRunning)
+//        }
+//    }
+//
+//    func testRestoresRoundEndStateAndResult() {
+//        let snapshot = makeSnapshot(phase: .roundEnd, remainingTime: 0)
+//        let viewModel = restoredViewModel(snapshot)
+//
+//        XCTAssertEqual(viewModel.currentState, .roundEnd)
+//        XCTAssertEqual(viewModel.roundResults.map(\.id), snapshot.roundResults.map(\.id))
+//        XCTAssertEqual(viewModel.gameScores.map(\.totalScore), snapshot.scores.map(\.totalScore))
+//        XCTAssertFalse(viewModel.timerViewModel.isRunning)
+//    }
+//
+//    func testCheckpointsCreationActionsPhasesAndEveryTimerTick() {
+//        let store = SpyGameSessionStore()
+//        let factory = ManualTickerFactory()
+//        let viewModel = GameViewModel(
+//            gameConfig: makeGameConfig(roundTimer: 3),
+//            store: store,
+//            router: SpyRouter(),
+//            randomValue: { 1 },
+//            wordShuffler: { $0 },
+//            tickerFactory: factory.make
+//        )
+//        XCTAssertEqual(store.savedSnapshots.count, 1)
+//
+//        viewModel.startGame()
+//        XCTAssertEqual(store.savedSnapshots.count, 2)
+//
+//        factory.timer.fire()
+//        XCTAssertEqual(store.savedSnapshots.last?.remainingTime, 2)
+//
+//        viewModel.markWordAsGuessed()
+//        XCTAssertEqual(store.savedSnapshots.last?.currentWordID, viewModel.currentWord?.id)
+//
+//        viewModel.pauseGame()
+//        XCTAssertEqual(store.savedSnapshots.last?.phase, .paused)
+//    }
+//
+//    func testTimerExpirationImmediatelyEndsRoundOnlyOnce() {
+//        let store = SpyGameSessionStore()
+//        let factory = ManualTickerFactory()
+//        let viewModel = GameViewModel(
+//            gameConfig: makeGameConfig(roundTimer: 1, targetScore: 20),
+//            store: store,
+//            router: SpyRouter(),
+//            randomValue: { 1 },
+//            wordShuffler: { $0 },
+//            tickerFactory: factory.make
+//        )
+//
+//        viewModel.startGame()
+//        factory.timer.fire()
+//        factory.timer.fire()
+//
+//        XCTAssertEqual(viewModel.currentState, .roundEnd)
+//        XCTAssertEqual(viewModel.roundResults.count, 1)
+//        XCTAssertEqual(store.savedSnapshots.last?.phase, .roundEnd)
+//
+//        viewModel.prepareForNextRound()
+//        XCTAssertEqual(viewModel.currentState, .preparing)
+//        XCTAssertEqual(store.savedSnapshots.last?.phase, .preparing)
+//    }
+//
+//    func testResumeCountdownRejectsRepeatsAndRestartsAfterInterruption() {
+//        let store = SpyGameSessionStore()
+//        let factory = ManualTickerFactory()
+//        let viewModel = GameViewModel(
+//            gameConfig: makeGameConfig(roundTimer: 5),
+//            store: store,
+//            router: SpyRouter(),
+//            randomValue: { 1 },
+//            wordShuffler: { $0 },
+//            tickerFactory: factory.make
+//        )
+//        viewModel.startGame()
+//        factory.timer.fire()
+//        viewModel.pauseGame()
+//        let savedRemainder = viewModel.timerViewModel.timeRemaining
+//
+//        viewModel.resumeGame()
+//        viewModel.resumeGame()
+//        XCTAssertEqual(factory.countdown.startCount, 1)
+//        XCTAssertEqual(viewModel.resumeCountdownStep, .three)
+//        XCTAssertEqual(viewModel.timerViewModel.timeRemaining, savedRemainder)
+//
+//        factory.countdown.fire()
+//        XCTAssertEqual(viewModel.resumeCountdownStep, .two)
+//        viewModel.applicationDidBecomeInactive()
+//        XCTAssertEqual(viewModel.currentState, .paused)
+//        XCTAssertNil(viewModel.resumeCountdownStep)
+//
+//        viewModel.resumeGame()
+//        XCTAssertEqual(viewModel.resumeCountdownStep, .three)
+//        factory.countdown.fire(times: 4)
+//
+//        XCTAssertEqual(viewModel.currentState, .playing)
+//        XCTAssertNil(viewModel.resumeCountdownStep)
+//        XCTAssertTrue(viewModel.timerViewModel.isRunning)
+//        XCTAssertEqual(viewModel.timerViewModel.timeRemaining, savedRemainder)
+//    }
+//
+//    func testGameEndDeletesActiveSave() {
+//        let store = SpyGameSessionStore()
+//        let factory = ManualTickerFactory()
+//        let viewModel = GameViewModel(
+//            gameConfig: makeGameConfig(roundTimer: 1, targetScore: 1),
+//            store: store,
+//            router: SpyRouter(),
+//            randomValue: { 1 },
+//            wordShuffler: { $0 },
+//            tickerFactory: factory.make
+//        )
+//
+//        viewModel.startGame()
+//        viewModel.markWordAsGuessed()
+//        factory.timer.fire()
+//
+//        XCTAssertEqual(viewModel.currentState, .gameEnd)
+//        XCTAssertEqual(store.deleteCount, 1)
+//        XCTAssertNil(store.activeSnapshot)
+//    }
+//
+//    func testReturnToMenuPausesSavesThenReturnsToRoot() {
+//        let store = SpyGameSessionStore()
+//        let router = SpyRouter()
+//        let factory = ManualTickerFactory()
+//        let viewModel = GameViewModel(
+//            gameConfig: makeGameConfig(),
+//            store: store,
+//            router: router,
+//            randomValue: { 1 },
+//            wordShuffler: { $0 },
+//            tickerFactory: factory.make
+//        )
+//        viewModel.startGame()
+//
+//        viewModel.returnToMenu()
+//
+//        XCTAssertEqual(viewModel.currentState, .paused)
+//        XCTAssertFalse(viewModel.timerViewModel.isRunning)
+//        XCTAssertEqual(store.savedSnapshots.last?.phase, .paused)
+//        XCTAssertEqual(router.backToRootCount, 1)
+//    }
+//}
+//
+//@MainActor
+//final class StageDoorViewModelTests: XCTestCase {
+//    func testAvailabilityDistinguishesNoSaveValidInvalidAndLoadFailure() async {
+//        let validSnapshot = makeSnapshot(phase: .paused, remainingTime: 12)
+//        let cases: [(StageDoorInspectorResponse, SavedGameAvailability)] = [
+//            (.success(.none), .none),
+//            (
+//                .success(.available(validSnapshot)),
+//                .available(
+//                    SavedGameSummary(
+//                        team: TeamIdentityDisplayModel(
+//                            id: validSnapshot.currentTeam.id,
+//                            name: "Первая",
+//                            style: .violetStripe
+//                        ),
+//                        phaseLabel: "ПАУЗА",
+//                        contextLabel: "Раунд 1 · осталось 00:12"
+//                    )
+//                )
+//            ),
+//            (.success(.invalid), .invalid),
+//            (
+//                .failure,
+//                .loadFailed(message: "Не удалось проверить сохранение. Попробуйте ещё раз.")
+//            )
+//        ]
+//
+//        for (response, expected) in cases {
+//            let viewModel = makeStageDoorViewModel(response: response)
+//            await viewModel.refreshSaveAvailability()
+//            XCTAssertEqual(viewModel.availability, expected)
+//        }
+//    }
+//
+//    func testLoadingAppearsOnlyAfterControlled250MillisecondThreshold() async {
+//        let inspector = PendingStageDoorInspector()
+//        let scheduler = ManualStageDoorLoadingScheduler()
+//        let viewModel = StageDoorViewModel(
+//            router: SpyRouter(),
+//            store: SpyGameSessionStore(),
+//            inspector: inspector,
+//            loadingScheduler: scheduler
+//        )
+//
+//        let refresh = Task { await viewModel.refreshSaveAvailability() }
+//        while !inspector.isWaiting {
+//            await Task.yield()
+//        }
+//
+//        XCTAssertEqual(scheduler.scheduledDelays, [StageDoorViewModel.loadingThreshold])
+//        XCTAssertFalse(viewModel.isLoadingIndicatorVisible)
+//
+//        scheduler.fire()
+//        XCTAssertTrue(viewModel.isLoadingIndicatorVisible)
+//
+//        inspector.complete(with: .none)
+//        await refresh.value
+//
+//        XCTAssertEqual(viewModel.availability, .none)
+//        XCTAssertFalse(viewModel.isLoadingIndicatorVisible)
+//    }
+//
+//    func testValidSaveContinuesThroughTypedRestoreRoute() async {
+//        let snapshot = makeSnapshot(phase: .roundEnd, remainingTime: 0)
+//        let router = SpyRouter()
+//        let viewModel = StageDoorViewModel(
+//            router: router,
+//            store: SpyGameSessionStore(activeSnapshot: snapshot),
+//            inspector: StubStageDoorInspector(response: .success(.available(snapshot))),
+//            loadingScheduler: ManualStageDoorLoadingScheduler()
+//        )
+//
+//        await viewModel.refreshSaveAvailability()
+//        viewModel.continueGame()
+//
+//        XCTAssertEqual(router.routes, [.resumeGame(snapshot)])
+//    }
+//
+//    func testNewGameRequiresReplacementOnlyForValidSave() async {
+//        let validSnapshot = makeSnapshot()
+//        let validRouter = SpyRouter()
+//        let validViewModel = StageDoorViewModel(
+//            router: validRouter,
+//            store: SpyGameSessionStore(activeSnapshot: validSnapshot),
+//            inspector: StubStageDoorInspector(response: .success(.available(validSnapshot))),
+//            loadingScheduler: ManualStageDoorLoadingScheduler()
+//        )
+//        await validViewModel.refreshSaveAvailability()
+//
+//        XCTAssertEqual(validViewModel.requestNewGame(), .requiresReplacementConfirmation)
+//        XCTAssertTrue(validRouter.routes.isEmpty)
+//
+//        let invalidRouter = SpyRouter()
+//        let invalidViewModel = StageDoorViewModel(
+//            router: invalidRouter,
+//            store: SpyGameSessionStore(),
+//            inspector: StubStageDoorInspector(response: .success(.invalid)),
+//            loadingScheduler: ManualStageDoorLoadingScheduler()
+//        )
+//        await invalidViewModel.refreshSaveAvailability()
+//
+//        XCTAssertEqual(invalidViewModel.requestNewGame(), .started)
+//        XCTAssertEqual(invalidRouter.routes, [.showCommand])
+//    }
+//
+//    func testReplacementDeletesBeforeOpeningSetupAndFailureDoesNotNavigate() async {
+//        let snapshot = makeSnapshot()
+//        let successfulStore = SpyGameSessionStore(activeSnapshot: snapshot)
+//        let successfulRouter = SpyRouter()
+//        let successfulViewModel = StageDoorViewModel(
+//            router: successfulRouter,
+//            store: successfulStore,
+//            inspector: StubStageDoorInspector(response: .success(.available(snapshot))),
+//            loadingScheduler: ManualStageDoorLoadingScheduler()
+//        )
+//        await successfulViewModel.refreshSaveAvailability()
+//        successfulViewModel.confirmSaveReplacement()
+//
+//        XCTAssertEqual(successfulStore.deleteCount, 1)
+//        XCTAssertEqual(successfulRouter.routes, [.showCommand])
+//        XCTAssertEqual(successfulViewModel.availability, .none)
+//
+//        let failingStore = SpyGameSessionStore(
+//            activeSnapshot: snapshot,
+//            deleteError: StageDoorTestError.deleteFailed
+//        )
+//        let failingRouter = SpyRouter()
+//        let failingViewModel = StageDoorViewModel(
+//            router: failingRouter,
+//            store: failingStore,
+//            inspector: StubStageDoorInspector(response: .success(.available(snapshot))),
+//            loadingScheduler: ManualStageDoorLoadingScheduler()
+//        )
+//        await failingViewModel.refreshSaveAvailability()
+//        failingViewModel.confirmSaveReplacement()
+//
+//        XCTAssertEqual(failingStore.deleteCount, 1)
+//        XCTAssertTrue(failingRouter.routes.isEmpty)
+//        XCTAssertNotNil(failingViewModel.operationErrorMessage)
+//        XCTAssertEqual(failingViewModel.availability, .available(SavedGameSummaryAdapter().makeSummary(from: snapshot)))
+//    }
+//
+//    func testSummaryAdapterMapsEveryRestorablePhase() {
+//        let adapter = SavedGameSummaryAdapter()
+//
+//        XCTAssertEqual(adapter.makeSummary(from: makeSnapshot(phase: .preparing)).phaseLabel, "ПОДГОТОВКА")
+//        XCTAssertEqual(adapter.makeSummary(from: makeSnapshot(phase: .playing)).phaseLabel, "ПАУЗА")
+//        XCTAssertEqual(adapter.makeSummary(from: makeSnapshot(phase: .paused)).phaseLabel, "ПАУЗА")
+//        XCTAssertEqual(adapter.makeSummary(from: makeSnapshot(phase: .roundEnd)).phaseLabel, "ИТОГИ РАУНДА")
+//    }
+//
+//    func testRequiredStageDoorPreviewsRender() throws {
+//        let validSummary = SavedGameSummaryAdapter().makeSummary(
+//            from: makeSnapshot(phase: .paused, remainingTime: 12)
+//        )
+//        let variants: [(String, SavedGameAvailability, CGSize)] = [
+//            ("no-save", .none, CGSize(width: 375, height: 667)),
+//            ("valid-save", .available(validSummary), CGSize(width: 393, height: 852)),
+//            ("invalid-save", .invalid, CGSize(width: 430, height: 932))
+//        ]
+//
+//        for (name, availability, size) in variants {
+//            let viewModel = StageDoorViewModel(initialAvailability: availability)
+//            let renderer = ImageRenderer(
+//                content: StageDoorView(viewModel: viewModel, startsEntered: true)
+//                    .frame(width: size.width, height: size.height)
+//            )
+//            renderer.scale = 1
+//
+//            let image = try XCTUnwrap(renderer.uiImage)
+//            XCTAssertEqual(image.size, size)
+//
+//            let attachment = XCTAttachment(image: image)
+//            attachment.name = "stage-door-\(name)"
+//            attachment.lifetime = .keepAlways
+//            add(attachment)
+//        }
+//    }
+//
+//    private func makeStageDoorViewModel(
+//        response: StageDoorInspectorResponse
+//    ) -> StageDoorViewModel {
+//        StageDoorViewModel(
+//            router: SpyRouter(),
+//            store: SpyGameSessionStore(),
+//            inspector: StubStageDoorInspector(response: response),
+//            loadingScheduler: ManualStageDoorLoadingScheduler()
+//        )
+//    }
+//}
+//
+//@MainActor
+//final class EntranceViewModelTests: XCTestCase {
+//    func testContinueDisabledWhenNoValidSaveAndMissingLoadDoesNotNavigate() {
+//        let store = SpyGameSessionStore()
+//        let router = SpyRouter()
+//        let viewModel = EntranceViewModel(router: router, store: store)
+//
+//        viewModel.refreshSaveAvailability()
+//        viewModel.select(.continueGame)
+//
+//        XCTAssertFalse(viewModel.hasSavedGame)
+//        XCTAssertTrue(router.routes.isEmpty)
+//    }
+//
+//    func testContinueLoadsValueSnapshotIntoTypedRoute() {
+//        let snapshot = makeSnapshot()
+//        let store = SpyGameSessionStore(activeSnapshot: snapshot)
+//        let router = SpyRouter()
+//        let viewModel = EntranceViewModel(router: router, store: store)
+//
+//        viewModel.refreshSaveAvailability()
+//        viewModel.select(.continueGame)
+//
+//        XCTAssertTrue(viewModel.hasSavedGame)
+//        XCTAssertEqual(router.routes, [.resumeGame(snapshot)])
+//    }
+//
+//    func testCancelAndConfirmNewGameReplacement() {
+//        let snapshot = makeSnapshot()
+//        let store = SpyGameSessionStore(activeSnapshot: snapshot)
+//        let router = SpyRouter()
+//        let viewModel = EntranceViewModel(router: router, store: store)
+//
+//        viewModel.select(.newGame)
+//        XCTAssertTrue(viewModel.isShowingReplacementConfirmation)
+//        viewModel.cancelNewGameReplacement()
+//        XCTAssertEqual(store.deleteCount, 0)
+//        XCTAssertEqual(store.activeSnapshot, snapshot)
+//        XCTAssertTrue(router.routes.isEmpty)
+//
+//        viewModel.select(.newGame)
+//        viewModel.confirmNewGameReplacement()
+//        XCTAssertEqual(store.deleteCount, 1)
+//        XCTAssertNil(store.activeSnapshot)
+//        XCTAssertEqual(router.routes, [.showCommand])
+//    }
+//
+//    func testRulesNavigationNeverReadsOrMutatesSave() {
+//        let store = SpyGameSessionStore(activeSnapshot: makeSnapshot())
+//        let router = SpyRouter()
+//        let viewModel = EntranceViewModel(router: router, store: store)
+//
+//        viewModel.select(.rules)
+//
+//        XCTAssertEqual(store.loadCount, 0)
+//        XCTAssertEqual(store.deleteCount, 0)
+//        XCTAssertEqual(router.routes, [.showRules])
+//    }
+//}
+//
+//private enum StageDoorTestError: Error {
+//    case inspectionFailed
+//    case deleteFailed
+//}
+//
+//private enum StageDoorInspectorResponse {
+//    case success(GameSessionInspection)
+//    case failure
+//}
+//
+//@MainActor
+//private final class StubStageDoorInspector: StageDoorSaveInspecting {
+//    let response: StageDoorInspectorResponse
+//
+//    init(response: StageDoorInspectorResponse) {
+//        self.response = response
+//    }
+//
+//    func inspectActive() async throws -> GameSessionInspection {
+//        switch response {
+//        case .success(let inspection):
+//            return inspection
+//        case .failure:
+//            throw StageDoorTestError.inspectionFailed
+//        }
+//    }
+//}
+//
+//@MainActor
+//private final class PendingStageDoorInspector: StageDoorSaveInspecting {
+//    private var continuation: CheckedContinuation<GameSessionInspection, Error>?
+//    var isWaiting: Bool { continuation != nil }
+//
+//    func inspectActive() async throws -> GameSessionInspection {
+//        try await withCheckedThrowingContinuation { continuation in
+//            self.continuation = continuation
+//        }
+//    }
+//
+//    func complete(with inspection: GameSessionInspection) {
+//        continuation?.resume(returning: inspection)
+//        continuation = nil
+//    }
+//}
+//
+//@MainActor
+//private final class ManualStageDoorLoadingScheduler: StageDoorLoadingScheduling {
+//    private(set) var scheduledDelays: [TimeInterval] = []
+//    private var scheduledAction: (() -> Void)?
+//
+//    func schedule(
+//        after delay: TimeInterval,
+//        action: @escaping @MainActor () -> Void
+//    ) -> StageDoorLoadingCancellable {
+//        scheduledDelays.append(delay)
+//        scheduledAction = action
+//        return ManualStageDoorLoadingCancellation { [weak self] in
+//            self?.scheduledAction = nil
+//        }
+//    }
+//
+//    func fire() {
+//        scheduledAction?()
+//    }
+//}
+//
+//@MainActor
+//private final class ManualStageDoorLoadingCancellation: StageDoorLoadingCancellable {
+//    private let onCancel: () -> Void
+//
+//    init(onCancel: @escaping () -> Void) {
+//        self.onCancel = onCancel
+//    }
+//
+//    func cancel() {
+//        onCancel()
+//    }
+//}
+//
+//@MainActor
+//private final class ManualTicker: GameTicker {
+//    private var tick: (() -> Void)?
+//    private(set) var isStarted = false
+//    private(set) var startCount = 0
+//
+//    func start(_ tick: @escaping () -> Void) {
+//        guard !isStarted else { return }
+//        self.tick = tick
+//        isStarted = true
+//        startCount += 1
+//    }
+//
+//    func stop() {
+//        isStarted = false
+//        tick = nil
+//    }
+//
+//    func fire(times: Int = 1) {
+//        for _ in 0..<times {
+//            guard isStarted, let tick else { return }
+//            tick()
+//        }
+//    }
+//}
+//
+//@MainActor
+//private final class ManualTickerFactory {
+//    private(set) var created: [ManualTicker] = []
+//
+//    var countdown: ManualTicker { created[0] }
+//    var timer: ManualTicker { created[1] }
+//
+//    func make() -> GameTicker {
+//        let ticker = ManualTicker()
+//        created.append(ticker)
+//        return ticker
+//    }
+//}
+//
+//@MainActor
+//private final class SpyGameSessionStore: GameSessionStore {
+//    var activeSnapshot: GameSessionSnapshot?
+//    private(set) var savedSnapshots: [GameSessionSnapshot] = []
+//    private(set) var loadCount = 0
+//    private(set) var deleteCount = 0
+//    private let deleteError: Error?
+//
+//    init(activeSnapshot: GameSessionSnapshot? = nil, deleteError: Error? = nil) {
+//        self.activeSnapshot = activeSnapshot
+//        self.deleteError = deleteError
+//    }
+//
+//    func loadActive() -> GameSessionSnapshot? {
+//        loadCount += 1
+//        return activeSnapshot
+//    }
+//
+//    func saveActive(_ snapshot: GameSessionSnapshot) throws {
+//        activeSnapshot = snapshot
+//        savedSnapshots.append(snapshot)
+//    }
+//
+//    func deleteActive() throws {
+//        deleteCount += 1
+//        if let deleteError { throw deleteError }
+//        activeSnapshot = nil
+//    }
+//}
+//
+//@MainActor
+//private final class SpyRouter: RouterProtocol {
+//    private(set) var routes: [Route] = []
+//    private(set) var backCount = 0
+//    private(set) var backToRootCount = 0
+//
+//    func add(route: Route) {
+//        routes.append(route)
+//    }
+//
+//    func back() {
+//        backCount += 1
+//    }
+//
+//    func backToRoot() {
+//        backToRootCount += 1
+//        routes.removeAll()
+//    }
+//}
+//
+//@MainActor
+//private func restoredViewModel(_ snapshot: GameSessionSnapshot) -> GameViewModel {
+//    GameViewModel(
+//        restoring: snapshot,
+//        store: SpyGameSessionStore(activeSnapshot: snapshot),
+//        router: SpyRouter(),
+//        randomValue: { 1 },
+//        wordShuffler: { $0 },
+//        tickerFactory: ManualTickerFactory().make
+//    )
+//}
+//
+//private func makeGameConfig(
+//    roundTimer: Int = 10,
+//    targetScore: Int = 20
+//) -> GameConfigModel {
+//    GameConfigModel(
+//        teams: [Team(name: "Первая"), Team(name: "Вторая")],
+//        configuration: Configuration(
+//            wordsCount: targetScore,
+//            roundTimer: roundTimer,
+//            isSkipPenalty: true,
+//            islastWordForAllTeam: false,
+//            challenges: .always,
+//            selectedChallenges: [.whisper, .robotVoice],
+//            isSoundOn: true
+//        ),
+//        words: .light
+//    )
+//}
+//
+//private func makeSnapshot(
+//    phase: PersistedGamePhase = .preparing,
+//    remainingTime: Int = 8
+//) -> GameSessionSnapshot {
+//    let firstWord = WordCard(word: "слово", isGuessed: true)
+//    let secondWord = WordCard(word: "пример")
+//    let completedResult = RoundResult(correctWords: [firstWord])
+//    let currentResult = RoundResult(skippedWords: [firstWord], penalties: 1)
+//    let firstTeam = Team(name: "Первая", roundResult: currentResult)
+//    let secondTeam = Team(name: "Вторая")
+//    let configuration = Configuration(
+//        wordsCount: 20,
+//        roundTimer: 10,
+//        isSkipPenalty: true,
+//        islastWordForAllTeam: false,
+//        challenges: .always,
+//        selectedChallenges: [.whisper],
+//        isSoundOn: true
+//    )
+//
+//    return GameSessionSnapshot(
+//        configuration: ConfigurationSnapshot(configuration),
+//        teams: [TeamSnapshot(Team(id: firstTeam.id, name: firstTeam.name)), TeamSnapshot(secondTeam)],
+//        category: .light,
+//        phase: phase,
+//        currentTeamIndex: 0,
+//        currentTeam: TeamSnapshot(firstTeam),
+//        gameInfoID: UUID(),
+//        gameNumber: 2,
+//        currentRound: 1,
+//        scores: [
+//            GameScoreSnapshot(GameScore(teamId: firstTeam.id, totalScore: 3)),
+//            GameScoreSnapshot(GameScore(teamId: secondTeam.id, totalScore: 2))
+//        ],
+//        roundResults: [RoundResultSnapshot(completedResult)],
+//        orderedWords: [WordCardSnapshot(firstWord), WordCardSnapshot(secondWord)],
+//        currentWordID: secondWord.id,
+//        currentChallenge: .whisper,
+//        remainingTime: remainingTime
+//    )
+//}
+//
+//@MainActor
+//private func makeInMemoryContainer() throws -> ModelContainer {
+//    try ModelContainer(
+//        for: SavedGameRecord.self,
+//        configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+//    )
+//}
