@@ -56,13 +56,11 @@ use router operations rather than direct path mutation from views.
 
 ## Persistence
 
-Game preferences are stored as one Codable value in `UserDefaults`. This is an
-appropriate boundary while data remains small and device-local. Introduce a
-protocol-backed store when tests need isolation, migration failures require
-handling, or saved data becomes substantially more complex.
-
-Saved game progress is not implemented and must not be assumed from the
-existing `continueGame` route name.
+Game preferences are stored as one Codable value in `UserDefaults`. Saved game
+progress uses a protocol-backed one-slot SwiftData store so Stage Door can
+distinguish an absent save, a resumable snapshot, invalid data, and a storage
+failure. Keep migration and validation at that persistence boundary as the
+snapshot schema evolves.
 
 ## Extension rules
 

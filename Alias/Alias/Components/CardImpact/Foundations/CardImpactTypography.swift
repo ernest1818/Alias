@@ -23,6 +23,12 @@ enum CardImpactTypography {
   static var displayHero: Font { display(size: CardImpactTypeSize.displayHero) }
   static var gameWord: Font { display(size: CardImpactTypeSize.gameWord) }
   static var screenTitle: Font { display(size: CardImpactTypeSize.screenTitle) }
+  static var stageDoorActionLabel: Font { display(size: 30) }
+  static var rulesItemTitle: Font { display(size: 22) }
+
+  static func brandLockup(size: CGFloat) -> Font {
+    display(size: size)
+  }
 
   static let gameTimer = Font.system(
     size: CardImpactTypeSize.gameTimer,

@@ -43,7 +43,7 @@ struct TeamCard: View {
 
   private var identity: some View {
     HStack(spacing: CardImpactSpacing.space4) {
-      TeamMarker(style: team.style)
+      TeamIdentityMarker(style: team.style)
         .frame(width: 48, height: 48)
         .accessibilityHidden(true)
 
@@ -154,7 +154,7 @@ private struct CardImpactOffsetPressButtonStyle: ButtonStyle {
   }
 }
 
-private struct TeamMarker: View {
+struct TeamIdentityMarker: View {
   let style: TeamVisualStyle
 
   var body: some View {

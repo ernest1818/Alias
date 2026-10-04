@@ -14,7 +14,7 @@ the intended behavior is implemented and verified.
 | GAP-002 | Resolved | `gameplay` | Timer expiration now transitions immediately and idempotently to the round result. |
 | GAP-003 | Open | `preferences` | The “Звук в игре” preference is persisted and passed to the game, but swipe feedback always plays a system sound and haptic; button actions do not use the preference either. |
 | GAP-004 | Open | `gameplay` | The “Общее последнее слово” preference is persisted and passed forward but has no gameplay behavior. |
-| GAP-005 | Resolved | `app-navigation` | Continue and Rules now use distinct typed routes, and Continue restores the active snapshot. |
+| GAP-005 | Resolved | `app-navigation` | Stage Door now distinguishes no save, available, invalid, and load-failure states; Continue restores the active snapshot through a typed route, while Rules use an isolated native sheet. |
 | GAP-006 | Open | `new-game-setup` | Adding a team can select a name already in use; the team list renders by name even though teams have UUID identities. |
 | GAP-010 | Open | `word-categories` | When every word in a selected pool is guessed or skipped before the target score is reached, the game has no replenishment policy and stops producing an active card. |
 
@@ -22,7 +22,7 @@ the intended behavior is implemented and verified.
 
 | ID | Status | Area | Observed mismatch |
 | --- | --- | --- | --- |
-| GAP-007 | Open | Tests | Unit and UI test targets contain only generated example tests; baseline requirements have no automated acceptance coverage. |
+| GAP-007 | Resolved | Tests | Deterministic unit coverage now exercises configuration, game transitions, persistence, and Stage Door states; the unused UI-test target is excluded from the shared scheme. |
 | GAP-008 | Open | Navigation | Router dependencies are injected in some places and read from the shared singleton in others. |
 | GAP-009 | Resolved | Identity | `WordsCategory` now has stable raw-value identity suitable for SwiftUI and snapshot coding. |
 

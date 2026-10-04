@@ -25,8 +25,12 @@
 		888FFD0D2D39A1E900EF98A0 /* EntranceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888FFD0C2D39A1E900EF98A0 /* EntranceView.swift */; };
 		888FFD122D39A1EA00EF98A0 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 888FFD112D39A1EA00EF98A0 /* Preview Assets.xcassets */; };
 		888FFD1C2D39A1EB00EF98A0 /* AliasTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888FFD1B2D39A1EB00EF98A0 /* AliasTests.swift */; };
-		888FFD262D39A1EB00EF98A0 /* AliasUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888FFD252D39A1EB00EF98A0 /* AliasUITests.swift */; };
-		888FFD282D39A1EB00EF98A0 /* AliasUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888FFD272D39A1EB00EF98A0 /* AliasUITestsLaunchTests.swift */; };
+		88A1C0012F00000100000001 /* GameChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88A1C0022F00000100000001 /* GameChallenge.swift */; };
+		88A1C0102F00000100000010 /* PartyPopDesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88A1C0112F00000100000011 /* PartyPopDesignSystem.swift */; };
+		88B200012F00000200000001 /* StageDoorScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B200022F00000200000002 /* StageDoorScene.swift */; };
+		88B200032F00000200000003 /* StageDoorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B200042F00000200000004 /* StageDoorView.swift */; };
+		88B200052F00000200000005 /* StageDoorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B200062F00000200000006 /* StageDoorViewModel.swift */; };
+		88B200072F00000200000007 /* RulesSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B200082F00000200000008 /* RulesSheet.swift */; };
 		88E6F99C2D9F30E600735310 /* WordCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88E6F99A2D9F30E500735310 /* WordCardView.swift */; };
 		88E6F99D2D9F30E600735310 /* TimerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88E6F9972D9F30E500735310 /* TimerViewModel.swift */; };
 		88E6F99E2D9F30E600735310 /* TimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88E6F9992D9F30E500735310 /* TimerView.swift */; };
@@ -34,8 +38,6 @@
 		88E6F9A22DA1A9FD00735310 /* GameSkipButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88E6F9A12DA1A9FD00735310 /* GameSkipButton.swift */; };
 		88E6F9AD2DAC545300735310 /* StartGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88E6F9AC2DAC545300735310 /* StartGameView.swift */; };
 		88E6F9AF2DAC585700735310 /* GradientBackgraund+Modifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88E6F9AE2DAC585700735310 /* GradientBackgraund+Modifier.swift */; };
-		88A1C0012F00000100000001 /* GameChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88A1C0022F00000100000001 /* GameChallenge.swift */; };
-		88A1C0102F00000100000010 /* PartyPopDesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88A1C0112F00000100000011 /* PartyPopDesignSystem.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -77,9 +79,13 @@
 		888FFD172D39A1EB00EF98A0 /* AliasTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AliasTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		888FFD1B2D39A1EB00EF98A0 /* AliasTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AliasTests.swift; sourceTree = "<group>"; };
 		888FFD212D39A1EB00EF98A0 /* AliasUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AliasUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		888FFD252D39A1EB00EF98A0 /* AliasUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AliasUITests.swift; sourceTree = "<group>"; };
-		888FFD272D39A1EB00EF98A0 /* AliasUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AliasUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		889D2CA62E06D08D001C81DF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		88A1C0022F00000100000001 /* GameChallenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameChallenge.swift; sourceTree = "<group>"; };
+		88A1C0112F00000100000011 /* PartyPopDesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartyPopDesignSystem.swift; sourceTree = "<group>"; };
+		88B200022F00000200000002 /* StageDoorScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StageDoorScene.swift; sourceTree = "<group>"; };
+		88B200042F00000200000004 /* StageDoorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StageDoorView.swift; sourceTree = "<group>"; };
+		88B200062F00000200000006 /* StageDoorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StageDoorViewModel.swift; sourceTree = "<group>"; };
+		88B200082F00000200000008 /* RulesSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulesSheet.swift; sourceTree = "<group>"; };
 		88E6F9972D9F30E500735310 /* TimerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerViewModel.swift; sourceTree = "<group>"; };
 		88E6F9992D9F30E500735310 /* TimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerView.swift; sourceTree = "<group>"; };
 		88E6F99A2D9F30E500735310 /* WordCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordCardView.swift; sourceTree = "<group>"; };
@@ -87,8 +93,6 @@
 		88E6F9A12DA1A9FD00735310 /* GameSkipButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSkipButton.swift; sourceTree = "<group>"; };
 		88E6F9AC2DAC545300735310 /* StartGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartGameView.swift; sourceTree = "<group>"; };
 		88E6F9AE2DAC585700735310 /* GradientBackgraund+Modifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GradientBackgraund+Modifier.swift"; sourceTree = "<group>"; };
-		88A1C0022F00000100000001 /* GameChallenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameChallenge.swift; sourceTree = "<group>"; };
-		88A1C0112F00000100000011 /* PartyPopDesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartyPopDesignSystem.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -124,6 +128,10 @@
 		88729DDA2D5D1A7C007B62CB /* StartModule */ = {
 			isa = PBXGroup;
 			children = (
+				88B200022F00000200000002 /* StageDoorScene.swift */,
+				88B200042F00000200000004 /* StageDoorView.swift */,
+				88B200062F00000200000006 /* StageDoorViewModel.swift */,
+				88B200082F00000200000008 /* RulesSheet.swift */,
 				888FFD0C2D39A1E900EF98A0 /* EntranceView.swift */,
 				88729D952D39BFB4007B62CB /* EntranceViewModel.swift */,
 			);
@@ -204,7 +212,6 @@
 			children = (
 				888FFD092D39A1E900EF98A0 /* Alias */,
 				888FFD1A2D39A1EB00EF98A0 /* AliasTests */,
-				888FFD242D39A1EB00EF98A0 /* AliasUITests */,
 				888FFD082D39A1E900EF98A0 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -253,15 +260,6 @@
 				888FFD1B2D39A1EB00EF98A0 /* AliasTests.swift */,
 			);
 			path = AliasTests;
-			sourceTree = "<group>";
-		};
-		888FFD242D39A1EB00EF98A0 /* AliasUITests */ = {
-			isa = PBXGroup;
-			children = (
-				888FFD252D39A1EB00EF98A0 /* AliasUITests.swift */,
-				888FFD272D39A1EB00EF98A0 /* AliasUITestsLaunchTests.swift */,
-			);
-			path = AliasUITests;
 			sourceTree = "<group>";
 		};
 		88E6F9982D9F30E500735310 /* Timer */ = {
@@ -415,6 +413,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				88B200012F00000200000001 /* StageDoorScene.swift in Sources */,
+				88B200032F00000200000003 /* StageDoorView.swift in Sources */,
+				88B200052F00000200000005 /* StageDoorViewModel.swift in Sources */,
+				88B200072F00000200000007 /* RulesSheet.swift in Sources */,
 				88A1C0102F00000100000010 /* PartyPopDesignSystem.swift in Sources */,
 				88729DD92D5D1A79007B62CB /* MakeCommandViewModel.swift in Sources */,
 				88729DD52D5942D3007B62CB /* Router.swift in Sources */,
@@ -455,8 +457,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				888FFD262D39A1EB00EF98A0 /* AliasUITests.swift in Sources */,
-				888FFD282D39A1EB00EF98A0 /* AliasUITestsLaunchTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -658,7 +658,6 @@
 		888FFD2F2D39A1EB00EF98A0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -677,7 +676,6 @@
 		888FFD302D39A1EB00EF98A0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -696,7 +694,6 @@
 		888FFD322D39A1EB00EF98A0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -713,7 +710,6 @@
 		888FFD332D39A1EB00EF98A0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
